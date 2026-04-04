@@ -33,5 +33,43 @@ def create_k_grid(k_max=10.0, N=1000):
     dk = k[1] - k[0]
     return k, dk
 
+# ========================================
+# Energy functions
+# ========================================
 
+def epsilon_k(k):
+    """
+    Free particle kinetic energy: epsilon_k = k^2
+    """
+    return k**2
+
+def xi_k(k, mu):
+    """
+    Shifted energy relative to chemical potential.
+    
+    xi_k = epsilon_k - mu
+    """
+    return epsilon_k(k) - mu
+
+def E_k(k, mu, Delta):
+    """
+    Quasiparticle excitation energy in mean-field BCS theory.
+
+    E_k = sqrt(xi_k^2 + Delta^2)
+
+    Parameters:
+    -----------
+    k : array
+        Momentum grid
+    mu : float
+        Chemical potential
+    Delta : float
+        Pairing gap
+
+    Returns:
+    --------
+    E_k : array
+        Quasiparticle energies
+    """
+    return np.sqrt(xi_k(k, mu)**2 + Delta**2)
 
