@@ -1,4 +1,9 @@
 # physics.py
+"""
+Created on Sat Apr 4 18:15 2026
+
+@author: Pioli Valeria
+"""
 import numpy as np
 
 # ========================================
