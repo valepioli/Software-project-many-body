@@ -73,3 +73,60 @@ def E_k(k, mu, Delta):
     """
     return np.sqrt(xi_k(k, mu)**2 + Delta**2)
 
+# ========================================
+# Integrals for gap and number equations
+# ========================================
+
+def gap_integral(k, mu, Delta, dk):
+    """
+    Computes the regularized gap integral for the BCS equation.
+
+    Integral form:
+        I_gap = ∫ k^2 (1/(2 E_k) - 1/(2 k^2)) dk
+
+    Parameters:
+    -----------
+    k : array
+        Momentum grid
+    mu : float
+        Chemical potential
+    Delta : float
+        Pairing gap
+    dk : float
+        Momentum spacing
+
+    Returns:
+    --------
+    float
+        Value of the gap integral
+    """
+    Ek = E_k(k, mu, Delta)
+    integrand = 1/(2*Ek) - 1/(2*k**2)  # regularization to remove divergence
+    return np.sum(k**2 * integrand) * dk
+
+def number_integral(k, mu, Delta, dk):
+    """
+    Computes the particle number integral for the number equation.
+
+    Integral form:
+        n = ∫ k^2 * (1 - xi_k / E_k) dk
+
+    Parameters:
+    -----------
+    k : array
+        Momentum grid
+    mu : float
+        Chemical potential
+    Delta : float
+        Pairing gap
+    dk : float
+        Momentum spacing
+
+    Returns:
+    --------
+    float
+        Value of the number integral
+    """
+    Ek = E_k(k, mu, Delta)
+    integrand = 1 - xi_k(k, mu)/Ek
+    return np.sum(k**2 * integrand) * dk
