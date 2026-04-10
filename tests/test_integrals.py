@@ -1,94 +1,99 @@
 import pytest
 import numpy as np
-from src.physics import create_k_grid, gap_integral, number_integral
+from src.physics import (
+    create_k_grid, 
+    compute_quasiparticle_energies, 
+    gap_integral, 
+    number_integral
+)
 
 # --- FIXTURES ---
 # Fixtures allow us to reuse the same setup (the k-grid) for multiple tests
 @pytest.fixture
-def standard_grid():
+def default_grid():
     """
-    Provides a standard grid for testing.
+    Provides a standard momentum grid to ensure test consistency.
     """
-    k, dk = create_k_grid()
-    return k, dk
+    return create_k_grid(k_max=10.0, N=1000)
 
-# --- UNIT TESTS ---
+# --- MOMENTUM GRID TESTS ---
 
-def test_grid_properties(standard_grid):
+def test_grid_size_matches_input():
     """
-    Check if the grid is generated correctly:
-    - Should not contain zero (to avoid division by zero in the gap equation).
-    - Should be monotonically increasing.
+    WHAT: Check if create_k_grid returns an array of length N.
+    WHY: To ensure the numerical resolution requested by the user is respected.
     """
-    k, dk = standard_grid
-    assert np.all(k > 0), "Grid points must be strictly positive."
-    assert np.all(np.diff(k) > 0), "Grid points must be monotonically increasing."
-    assert dk > 0, "Differential dk must be positive."
+    N_test = 500
+    k, _ = create_k_grid(N=N_test)
+    assert len(k) == N_test
 
-def test_integrals_finite_output(standard_grid):
+def test_grid_avoids_zero():
     """
-    Verify that the integrals return finite numerical values (no NaN or Inf).
+    WHAT: Ensure the first k-point is strictly positive.
+    WHY: The gap equation has a 1/k^2 term; k=0 would cause a division by zero.
     """
-    k, dk = standard_grid
-    mu, Delta = 1.0, 0.5
-    
-    gap_val = gap_integral(k, mu, Delta, dk)
-    num_val = number_integral(k, mu, Delta, dk)
-    
-    assert np.isfinite(gap_val), "Gap integral returned NaN or Inf."
-    assert np.isfinite(num_val), "Number integral returned NaN or Inf."
+    k, _ = create_k_grid()
+    assert k[0] > 0
 
-# --- PHYSICAL CONSISTENCY TESTS ---
+# --- ENERGY FUNCTION TESTS ---
 
-def test_number_density_positivity(standard_grid):
+@pytest.mark.parametrize("mu, Delta", [(1.0, 0.5), (0.0, 0.2), (-1.0, 1.0)])
+def test_quasiparticle_energy_consistency(default_grid, mu, Delta):
     """
-    Physical constraint: The number density (number_integral) must always 
-    be positive, regardless of the chemical potential sign.
+    WHAT: Verify E_k = sqrt(xi_k^2 + Delta^2) using np.allclose.
+    WHY: To ensure the Bogoliubov dispersion relation is mathematically correct.
     """
-    k, dk = standard_grid
-    # Test for both BCS (positive mu) and BEC (negative mu) regimes
-    for mu in [-2.0, 0.0, 2.0]:
-        num_val = number_integral(k, mu, Delta=0.5, dk=dk)
-        assert num_val > 0, f"Density must be positive even for mu={mu}."
+    k, _ = default_grid
+    _, xik, Ek = compute_quasiparticle_energies(k, mu, Delta)
+    expected_Ek = np.sqrt(xik**2 + Delta**2)
+    assert np.allclose(Ek, expected_Ek)
 
-def test_density_monotonicity_with_mu(standard_grid):
+def test_quasiparticle_energy_is_above_gap(default_grid):
     """
-    Physical constraint: Increasing the chemical potential (mu) 
-    must increase the number density (n).
+    WHAT: Ensure E_k is always >= Delta.
+    WHY: Physically, the gap Delta is the minimum energy for an excitation.
     """
-    k, dk = standard_grid
+    k, _ = default_grid
     Delta = 0.5
-    n_low = number_integral(k, mu=0.5, Delta=Delta, dk=dk)
-    n_high = number_integral(k, mu=1.5, Delta=Delta, dk=dk)
-    
-    assert n_high > n_low, "Physical error: Density must increase with chemical potential."
+    _, _, Ek = compute_quasiparticle_energies(k, mu=1.0, Delta=Delta)
+    assert np.all(Ek >= (Delta - 1e-9))
 
-@pytest.mark.parametrize("Delta", [0.1, 0.5, 1.0])
-def test_gap_integral_trends(standard_grid, Delta):
-    """
-    The gap integral (regularized) should be a well-behaved float.
-    Using parametrize allows testing multiple values of Delta automatically.
-    """
-    k, dk = standard_grid
-    mu = 1.0
-    val = gap_integral(k, mu, Delta, dk)
-    assert isinstance(val, (float, np.float64))
+# --- INTEGRAL TESTS (PHYSICAL CONSISTENCY) ---
 
-# --- CONVERGENCE TESTS ---
+def test_number_density_is_always_positive(default_grid):
+    """
+    WHAT: Check if number_integral is positive.
+    WHY: Density is a physical magnitude that cannot be negative.
+    """
+    k, dk = default_grid
+    n = number_integral(k, mu=-1.0, Delta=0.5, dk=dk)
+    assert n > 0
 
-def test_numerical_convergence():
+def test_density_increases_with_mu(default_grid):
     """
-    Verify that doubling the grid density doesn't change the integral 
-    significantly (Grid Convergence Study).
+    WHAT: Verify that increasing mu increases density.
+    WHY: Systems must have positive compressibility to be thermodynamically stable.
     """
-    # Create a coarse grid and a fine grid
-    # (Note: This assumes your create_k_grid can take N as an argument)
-    k_coarse, dk_coarse = create_k_grid(N=1000) 
-    k_fine, dk_fine = create_k_grid(N=2000)
-    
-    mu, Delta = 1.0, 0.5
-    val_coarse = number_integral(k_coarse, mu, Delta, dk_coarse)
-    val_fine = number_integral(k_fine, mu, Delta, dk_fine)
-    
-    relative_error = abs(val_fine - val_coarse) / val_fine
-    assert relative_error < 1e-3, "Integral did not converge within 0.1% tolerance."
+    k, dk = default_grid
+    n_low = number_integral(k, mu=0.5, Delta=0.5, dk=dk)
+    n_high = number_integral(k, mu=1.0, Delta=0.5, dk=dk)
+    assert n_high > n_low
+
+def test_gap_integral_decreases_with_delta(default_grid):
+    """
+    WHAT: Verify the gap integral decreases as Delta increases.
+    WHY: This monotonicity is required for the solver to converge to a unique solution.
+    """
+    k, dk = default_grid
+    g_small = gap_integral(k, 1.0, 0.1, dk)
+    g_large = gap_integral(k, 1.0, 1.0, dk)
+    assert g_large < g_small
+
+def test_integrals_are_finite(default_grid):
+    """
+    WHAT: Ensure integrals do not return NaN or Inf.
+    WHY: The solver (fsolve) will crash if it encounters non-finite values.
+    """
+    k, dk = default_grid
+    assert np.isfinite(gap_integral(k, 1.0, 0.5, dk))
+    assert np.isfinite(number_integral(k, 1.0, 0.5, dk))

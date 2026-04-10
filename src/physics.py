@@ -35,43 +35,35 @@ def create_k_grid(k_max=10.0, N=1000):
 
 # ========================================
 # Energy functions
-# ========================================
-
-def epsilon_k(k):
+# =======================================
+def compute_quasiparticle_energies(k, mu, Delta):
     """
-    Free particle kinetic energy: epsilon_k = k^2
-    """
-    return k**2
-
-def xi_k(k, mu):
-    """
-    Shifted energy relative to chemical potential.
-    
-    xi_k = epsilon_k - mu
-    """
-    return epsilon_k(k) - mu
-
-def E_k(k, mu, Delta):
-    """
-    Quasiparticle excitation energy in mean-field BCS theory.
-
-    E_k = sqrt(xi_k^2 + Delta^2)
+    Calculate all energy components for the BCS-BEC crossover.
 
     Parameters:
     -----------
-    k : array
-        Momentum grid
+    k : ndarray
+        Momentum grid.
     mu : float
-        Chemical potential
+        Chemical potential.
     Delta : float
-        Pairing gap
+        Superconducting gap.
 
     Returns:
     --------
-    E_k : array
-        Quasiparticle energies
+    eps_k : ndarray
+        Kinetic energy (k^2 / 2m, here m=1 or 1/2 depending on convention).
+    xi_k : ndarray
+        Shifted energy (eps_k - mu).
+    E_k : ndarray
+        Quasiparticle excitation energy sqrt(xi_k^2 + Delta^2).
     """
-    return np.sqrt(xi_k(k, mu)**2 + Delta**2)
+    eps_k = k**2
+
+    xi_k = eps_k - mu
+    E_k = np.sqrt(xi_k**2 + Delta**2)
+
+    return eps_k, xi_k, E_k
 
 # ========================================
 # Integrals for gap and number equations
@@ -100,8 +92,9 @@ def gap_integral(k, mu, Delta, dk):
     float
         Value of the gap integral
     """
-    Ek = E_k(k, mu, Delta)
-    integrand = 1/(2*Ek) - 1/(2*k**2)  # regularization to remove divergence
+    # Unpack only what is needed (E_k is the third value)
+    _, _, Ek = compute_quasiparticle_energies(k, mu, Delta)
+    integrand = 1/(2*Ek) - 1/(2*k**2)
     return np.sum(k**2 * integrand) * dk
 
 def number_integral(k, mu, Delta, dk):
@@ -127,6 +120,7 @@ def number_integral(k, mu, Delta, dk):
     float
         Value of the number integral
     """
-    Ek = E_k(k, mu, Delta)
-    integrand = 1 - xi_k(k, mu)/Ek
+    # Unpack xi_k and E_k
+    _, xik, Ek = compute_quasiparticle_energies(k, mu, Delta)
+    integrand = 1 - xik/Ek
     return np.sum(k**2 * integrand) * dk
