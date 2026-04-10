@@ -10,7 +10,7 @@ import numpy as np
 # Momentum grid
 # ========================================
 
-def create_k_grid(k_max=10.0, N=1000):
+def create_k_grid(k_max, N):
     """
     Creates a 1D momentum grid for numerical integration.
 

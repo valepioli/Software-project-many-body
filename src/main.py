@@ -1,22 +1,19 @@
+#main.py
+"""
+Created on Sat Apr 4 18:15 2026
+
+@author: Pioli Valeria
+"""
+
 print("BEC–BCS project started")
 
-from physics import create_k_grid, gap_integral, number_integral
+from src.physics import create_k_grid
+from src.utils import load_parameters
 
-def main():
-    # Create momentum grid
-    k, dk = create_k_grid()
+# Load the parameters
+params = load_parameters("parameters.txt")
 
-    # Example initial guess
-    mu = 1.0
-    Delta = 0.5
+# This will pass N=2000 and k_max=8.0 automatically
+k, dk = create_k_grid(k_max=params['k_max'], N=int(params['N']))
 
-    # Compute integrals
-    gap_val = gap_integral(k, mu, Delta, dk)
-    num_val = number_integral(k, mu, Delta, dk)
-
-    # Print results for verification
-    print("Gap integral value:", gap_val)
-    print("Number integral value:", num_val)
-
-if __name__ == "__main__":
-    main()
+n_target = params['n_target']
