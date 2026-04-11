@@ -1,3 +1,10 @@
+# test_solver.py
+"""
+Created on Sat Apr 11 17:46 2026
+
+@author: Pioli Valeria
+"""
+
 import pytest
 import numpy as np
 from src.solver import bcs_objective_functions, solve_bcs_system

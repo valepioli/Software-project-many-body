@@ -1,3 +1,10 @@
+# solver.py
+"""
+Created on Sat Apr 11 17:46 2026
+
+@author: Pioli Valeria
+"""
+
 import numpy as np
 from scipy.optimize import root
 from src.physics import gap_integral, number_integral
