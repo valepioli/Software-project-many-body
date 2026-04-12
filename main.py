@@ -8,19 +8,16 @@ Created on Sat Apr 4 18:15 2026
 print("BEC–BCS project started")
 
 import numpy as np
-from src.utils import load_parameters
+from src.config import k_max, N, n_target, EF
 from src.physics import create_k_grid
 from src.solver import solve_bcs_system
 from src.plotting import plot_bcs_bec_crossover
 
 
-#1 Load the parameters
-params = load_parameters("parameters.txt")
-
-# This will pass N and k_max automatically
-k, dk = create_k_grid(k_max=params['k_max'], N=int(params['N']))
-
-n_target = params['n_target']
+#1. SETUP
+# k_max and N are now taken from config.py
+k, dk = create_k_grid(k_max=k_max, N=N)
+interaction_range = np.linspace(-2.0, 2.0, 40)
 
 # =============================================================================
 # 2. CROSSOVER SWEEP (ROOT-FINDING LOOP)
@@ -33,7 +30,7 @@ results = []
 interaction_range = np.linspace(-2.0, 2.0, 40) 
 # initial_guess: We start with a guess close to the BCS limit (mu ~ EF, Delta small).
 # This guess will be updated dynamically to improve convergence.
-current_guess = [1.0, 0.5]
+current_guess = [EF, 0.1]
 
 for x in interaction_range:
     """
@@ -47,7 +44,7 @@ for x in interaction_range:
     a = 1.0 / x if abs(x) > 1e-10 else 1e6
 
     # 2. Call the solver to find the [mu, Delta] pair that satisfies the system.
-    sol = solve_bcs_system(a, params['n_target'], k, dk, initial_guess=current_guess)
+    sol = solve_bcs_system(a, n_target, k, dk, initial_guess=current_guess)
 
     results.append(sol)
 
