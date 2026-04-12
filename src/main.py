@@ -10,7 +10,7 @@ print("BEC–BCS project started")
 from src.physics import create_k_grid
 from src.utils import load_parameters
 
-# Load the parameters
+#1 Load the parameters
 params = load_parameters("parameters.txt")
 
 # This will pass N and k_max automatically
@@ -50,3 +50,12 @@ for x in interaction_range:
     # stability as the chemical potential and gap evolve smoothly across the crossover.
     if not np.isnan(sol[0]):
         current_guess = sol
+
+# 3. DATA PREPROCESSING
+# Separate the results into two arrays for plotting
+results_array = np.array(results)
+mu_vals = results_array[:, 0]
+delta_vals = results_array[:, 1]
+
+# 4. VISUALIZATION
+plot_bcs_bec_crossover(interaction_range, mu_vals, delta_vals)
