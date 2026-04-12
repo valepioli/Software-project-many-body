@@ -7,8 +7,12 @@ Created on Sat Apr 4 18:15 2026
 
 print("BEC–BCS project started")
 
-from src.physics import create_k_grid
+import numpy as np
 from src.utils import load_parameters
+from src.physics import create_k_grid
+from src.solver import solve_bcs_system
+from src.plotting import plot_bcs_bec_crossover
+
 
 #1 Load the parameters
 params = load_parameters("parameters.txt")
@@ -24,6 +28,9 @@ n_target = params['n_target']
 
 results = []
 
+# Define the range for the dimensionless interaction parameter 1/(kF * a)
+# Usually from -2 (BCS) to +2 (BEC)
+interaction_range = np.linspace(-2.0, 2.0, 40) 
 # initial_guess: We start with a guess close to the BCS limit (mu ~ EF, Delta small).
 # This guess will be updated dynamically to improve convergence.
 current_guess = [1.0, 0.5]
