@@ -58,10 +58,10 @@ def compute_quasiparticle_energies(k, mu, Delta):
     E_k : ndarray
         Quasiparticle excitation energy sqrt(xi_k^2 + Delta^2).
     """
-    eps_k = k**2
+    eps_k =0.5*k**2
 
     xi_k = eps_k - mu
-    E_k = np.sqrt(xi_k**2 + Delta**2)
+    E_k = np.sqrt(xi_k**2 + np.abs(Delta)**2)
 
     return eps_k, xi_k, E_k
 
@@ -73,9 +73,9 @@ def gap_integral(k, mu, Delta, dk):
     """
     Computes the regularized gap integral for the BCS equation.
 
-    Integral form:
-        I_gap = ∫ k^2 (1/(2 E_k) - 1/(2 k^2)) dk
-
+    To avoid UV divergence in 3D, we subtract the vacuum contribution:
+    Integral form: ∫ [k^2 / 2π^2] * (1/(2 E_k) - 1/(2 eps_k)) dk
+    Since eps_k = k^2/2, the second term simplifies to 1/k^2.
     Parameters:
     -----------
     k : array
@@ -94,15 +94,19 @@ def gap_integral(k, mu, Delta, dk):
     """
     # Unpack only what is needed (E_k is the third value)
     _, _, Ek = compute_quasiparticle_energies(k, mu, Delta)
-    integrand = 1/(2*Ek) - 1/(2*k**2)
-    return np.sum(k**2 * integrand) * dk
+    # Regularized integrand: removes the linear divergence as k -> infinity
+    integrand = (1.0 / (2.0 * Ek)) - (1.0 / (k**2))
+
+    # (1 / 2*pi^2) comes from the 3D volume element 4*pi*k^2 / (2*pi)^3
+    return (1.0 / (2.0 * np.pi**2)) * np.sum(k**2 * integrand) * dk
 
 def number_integral(k, mu, Delta, dk):
     """
-    Computes the particle number integral for the number equation.
 
-    Integral form:
-        n = ∫ k^2 * (1 - xi_k / E_k) dk
+    Computes the particle density integral (per spin species).
+
+    n_species = ∫ [k^2 / 2π^2] * v_k^2 dk
+    where v_k^2 = 0.5 * (1 - xi_k / E_k) is the hole occupancy.
 
     Parameters:
     -----------
@@ -122,5 +126,8 @@ def number_integral(k, mu, Delta, dk):
     """
     # Unpack xi_k and E_k
     _, xik, Ek = compute_quasiparticle_energies(k, mu, Delta)
-    integrand = 1 - xik/Ek
-    return np.sum(k**2 * integrand) * dk
+    # Occupancy probability v_k^2
+    v_k_sq = 0.5 * (1.0 - xik / Ek)
+
+    # Total density for one spin species in 3D
+    return (1.0 / (2.0 * np.pi**2)) * np.sum(k**2 * v_k_sq) * dk
