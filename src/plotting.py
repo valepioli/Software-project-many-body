@@ -7,8 +7,9 @@ Created on Sun Apr 12 19:25 2026
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os 
 
-def plot_bcs_bec_crossover(interaction_range, mu_vals, delta_vals):
+def plot_bcs_bec_crossover(interaction_range, mu_vals, delta_vals, save_path=None):
     """
     Generates  plot of mu and delta.
 
