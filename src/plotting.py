@@ -41,6 +41,11 @@ def plot_bcs_bec_crossover(interaction_range, mu_vals, delta_vals):
     plt.grid(True, which='both', linestyle='--', alpha=0.6)
     plt.legend(fontsize=10)
 
-    # Final display
     plt.tight_layout()
+    # --- Save the plot ---
+    if save_path:
+        file_name = os.path.join(save_path, "crossover_plot.png")
+        plt.savefig(file_name, dpi=300)
+        print(f"Plot saved in {file_name}")
+
     plt.show()

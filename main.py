@@ -8,6 +8,7 @@ Created on Sat Apr 4 18:15 2026
 print("BEC–BCS project started")
 
 import numpy as np
+import os
 from src.config import k_max, N, n_target, EF
 from src.physics import create_k_grid
 from src.solver import solve_bcs_system
@@ -63,7 +64,21 @@ results_array = np.array(results)
 mu_vals_normalized = results_array[:, 0] / EF
 delta_vals_normalized = results_array[:, 1] / EF
 
+# --- Save results to folder ---
+output_folder = "results"
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+# Combine interaction range, mu and delta into one matrix for saving
+data_to_save = np.column_stack((interaction_range, mu_vals_normalized, delta_vals_normalized))
+
+# Save as a text file
+header = "1/kFa, mu/EF, Delta/EF"
+np.savetxt(f"{output_folder}/crossover_data.txt", data_to_save, header=header, fmt="%.6f", delimiter="\t")
+print(f"Numerical data saved in {output_folder}/crossover_data.txt")
+
 # =============================================================================
 # 4. VISUALIZATION
 # =============================================================================
-plot_bcs_bec_crossover(interaction_range, mu_vals_normalized, delta_vals_normalized)
+# Pass the folder path to the plot function to save the image
+plot_bcs_bec_crossover(interaction_range, mu_vals_normalized, delta_vals_normalized, save_path=output_folder)
