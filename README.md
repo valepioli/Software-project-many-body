@@ -79,7 +79,7 @@ python3 main.py
 
 Upon execution, the simulation automatically creates a `results/` directory containing the following files:
 
-*   **`crossover_plot.png`**: A high-resolution visualization showing the evolution of the normalized Chemical Potential ($\mu/E_F$) and the Pairing Gap ($\Delta/E_F$) across the interaction range.
+*   **`crossover_plot.png`**: A plot showing the evolution of the normalized Chemical Potential ($\mu/E_F$) and the Pairing Gap ($\Delta/E_F$) across the interaction range.
 *   **`crossover_data.txt`**: A tab-separated text file containing the raw numerical results ($1/k_Fa$, $\mu/E_F$, $\Delta/E_F$) for use in external data analysis software.
 ## Expected Results
 
