@@ -41,7 +41,7 @@ for x in interaction_range:
     # 1. Map dimensionless parameter 'x' to scattering length 'a'.
     # For x = 0 (unitary limit), we use a large number (1e6) to approximate
     # the physical infinity 1/a -> 0.
-    a = 1.0 / x if abs(x) > 1e-10 else 1e6
+    a = 1.0 / x if abs(x) > 1e-12 else 1e12
 
     # 2. Call the solver to find the [mu, Delta] pair that satisfies the system.
     sol = solve_bcs_system(a, n_target, k, dk, initial_guess=current_guess)
@@ -58,8 +58,12 @@ for x in interaction_range:
 # 3. DATA PREPROCESSING
 # Separate the results into two arrays for plotting
 results_array = np.array(results)
-mu_vals = results_array[:, 0]
-delta_vals = results_array[:, 1]
+# NORMALIZATION: Divide by EF to get dimensionless units (mu/EF and Delta/EF)
+# This ensures the BCS limit starts at 1.0, which is physically correct.
+mu_vals_normalized = results_array[:, 0] / EF
+delta_vals_normalized = results_array[:, 1] / EF
 
+# =============================================================================
 # 4. VISUALIZATION
-plot_bcs_bec_crossover(interaction_range, mu_vals, delta_vals)
+# =============================================================================
+plot_bcs_bec_crossover(interaction_range, mu_vals_normalized, delta_vals_normalized)
