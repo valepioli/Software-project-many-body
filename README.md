@@ -87,7 +87,7 @@ The simulation tracks the transition from the BCS limit to the BEC limit. The nu
 | Regime | Interaction ($1/k_Fa$) | $\mu / E_F$ | $\Delta / E_F$ | Physical Description |
 | :--- | :---: | :---: | :---: | :--- |
 | **BCS Limit** | $-2.0$ | $\approx 1.0$ | $\ll 1$ | Weakly interacting Cooper pairs |
-| **Unitary Point** | $0.0$ | $\approx 0.37$ | $\approx 0.44$ | Universal regime (Scattering length $a \to \infty$) |
+| **Unitary Point** | $0.0$ | $\approx 0.37$ | $\approx 0.44$ | Scattering length $a \to \infty$ |
 | **BEC Limit** | $+2.0$ | $< 0$ | $> 1.0$ | Tightly bound molecular dimers |
 
 ###  Physical Evolution
