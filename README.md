@@ -47,7 +47,7 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 ├── tests/              # Unit tests
 ├── main.py             # Main execution script
 └── requirements.txt    # Dependencies (numpy, scipy, matplotlib)
-
+```
 ## Goals
 
 * Implement a numerical solver for the coupled equations
@@ -56,15 +56,47 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 
 ---
 
-## How to run
+## 3. Installation and Setup
 
+Follow these steps to set up the project on your local machine:
+
+### 1. Clone the repository
 ```bash
-pip install -r requirements.txt
-python src/main.py
+git clone https://github.com/valepioli/Software-project-many-body.git
+cd Software-project-many-body
 ```
+### 2. Install dependencies
+```
+pip install -r requirements.txt
+```
+---
+## 3. Running the simulation
+To execute the solver and generate the crossover data:
+```
+python3 main.py
+```
+## Outputs
+
+Upon execution, the simulation automatically creates a `results/` directory containing the following files:
+
+*   **`crossover_plot.png`**: A high-resolution visualization showing the evolution of the normalized Chemical Potential ($\mu/E_F$) and the Pairing Gap ($\Delta/E_F$) across the interaction range.
+*   **`crossover_data.txt`**: A tab-separated text file containing the raw numerical results ($1/k_Fa$, $\mu/E_F$, $\Delta/E_F$) for use in external data analysis software.
+## Expected Results
+
+The simulation tracks the transition from the BCS limit to the BEC limit. The numerical results should match the standard mean-field benchmarks at zero temperature:
+| Regime | Interaction ($1/k_Fa$) | $\mu / E_F$ | $\Delta / E_F$ | Physical Description |
+| :--- | :---: | :---: | :---: | :--- |
+| **BCS Limit** | $-2.0$ | $\approx 1.0$ | $\ll 1$ | Weakly interacting Cooper pairs |
+| **Unitary Point** | $0.0$ | $\approx 0.37$ | $\approx 0.44$ | Universal regime (Scattering length $a \to \infty$) |
+| **BEC Limit** | $+2.0$ | $< 0$ | $> 1.0$ | Tightly bound molecular dimers |
+
+###  Physical Evolution
+*   **Chemical Potential ($\mu$):** Starts at the Fermi energy ($\mu = E_F$) in the BCS regime, decreases as attraction increases, and crosses zero near the unitary point ($1/k_Fa \approx 0.55$ in mean-field). In the BEC limit, $\mu$ becomes deeply negative, approaching half the dimer binding energy: $\mu \to -1/2a^2$.
+*   **Pairing Gap ($\Delta$):** Increases monotonically from the BCS to the BEC side, representing the transition from a soft pairing energy to a strong molecular binding energy.
+
+![Crossover Plot](results/crossover_plot.png)
 
 ---
-
 ## Status
 
 Project started – work in progress.
