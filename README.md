@@ -31,15 +31,6 @@ The total particle density $n$ is kept constant by solving for the chemical pote
 $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)$$
 
 ---
-
-## Features
-*   **Self-Consistent Solver**: Implements `scipy.optimize.root` with an iterative continuation method for high stability.
-*   **UV Convergence**: Uses a subtraction scheme for the gap equation, making results independent of the high-momentum cutoff.
-*   **Automatic Export**: Numerical data (`.txt`) and high-resolution plots (`.png`) are automatically saved to the `results/` folder.
-*   **Dimensionless Units**: All results are normalized to the Fermi Energy $E_F$ and Fermi Momentum $k_F$.
-
----
-
 ## Project Structure
 ```text
 ├── src/
@@ -52,6 +43,28 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 ├── main.py             # Main execution script
 └── requirements.txt    # Dependencies (numpy, scipy, matplotlib)
 ```
+---
+## Code Workflow
+
+### 1. Initialization and Grid Setup
+The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. It generates a high-density momentum grid ($k$-space) using a large UV cutoff ($k_{max} \approx 100 k_F$).
+
+### 2. Physical Engine (`src/physics.py`)
+At the core of the simulation are the **Gap** and **Number** integrals. 
+*   **Regularization:** The gap equation is regularized by subtracting the vacuum divergence ($1/k^2$), allowing for a finite result without needing an arbitrary cutoff.
+*   **Vectorization:** Integrals are computed using `numpy` vectorization over the $k$-grid for maximum performance.
+
+### 3. Iterative Solving Logic (`src/solver.py`)
+Since the equations are non-linearly coupled, the code uses `scipy.optimize.root`. 
+*   **Coupled System:** The solver varies $\mu$ and $\Delta$ simultaneously to find the root where both the Gap and Number residuals are zero.
+*   **Stability:** To prevent the solver from finding unphysical solutions, $\Delta$ is treated as an absolute value within the energy spectrum calculation.
+
+### 4. The Continuation Method (`main.py`)
+To solve the entire crossover (from $1/k_Fa = -2$ to $+2$), the code implements a **Continuation Method**:
+1.  It starts at the **BCS limit**, where the solution is well-known ($\mu \approx E_F$).
+2.  After solving for one point, it uses that result as the **initial guess** for the next interaction strength.
+3.  This "step-by-step" approach allows the solver to track the solution smoothly, even when $\mu$ crosses zero and becomes negative in the BEC regime.
+
 ## Goals
 
 * Implement a numerical solver for the coupled equations
@@ -84,7 +97,7 @@ python3 main.py
 Upon execution, the simulation automatically creates a `results/` directory containing the following files:
 
 *   **`crossover_plot.png`**: A plot showing the evolution of the normalized Chemical Potential ($\mu/E_F$) and the Pairing Gap ($\Delta/E_F$) across the interaction range.
-*   **`crossover_data.txt`**: A tab-separated text file containing the raw numerical results ($1/k_Fa$, $\mu/E_F$, $\Delta/E_F$) for use in external data analysis software.
+*   **`crossover_data.txt`**: A tab-separated text file containing the raw numerical results ($1/k_Fa$, $\mu/E_F$, $\Delta/E_F$).
 ## Expected Results
 
 The simulation tracks the transition from the BCS limit to the BEC limit. The numerical results should match the standard mean-field benchmarks at zero temperature:
