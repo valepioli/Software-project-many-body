@@ -24,7 +24,7 @@ where $\epsilon_k = \frac{\hbar^2 k^2}{2m}$ is the single-particle kinetic energ
 
 ### 2. The Regularized Gap Equation
 In 3D, the contact interaction leads to a UV divergence. We implement a regularized version of the gap equation to ensure convergence:
-$$\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left( \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right)$$
+$$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left( \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right)$$
 
 ### 3. The Number Equation
 The total particle density $n$ is kept constant by solving for the chemical potential $\mu$:
