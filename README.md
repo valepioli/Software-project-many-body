@@ -39,7 +39,7 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 │   ├── solver.py       # Numerical engine: system of equations and root-finding
 │   └── plotting.py     # Visualization: plot formatting and export
 ├── results/            # Output directory: saves plots (.png) and numerical data (.txt)
-├── tests/              # Software verification: unit tests for the physics modules
+├── tests/              # Software verification: tests for the modules
 ├── main.py             # Entry point: the simulation workflow
 ├── requirements.txt    # List of required Python libraries (numpy, scipy, matplotlib)
 └── .gitignore          # Rules for Git to ignore temporary and environment files
