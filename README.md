@@ -31,6 +31,7 @@ The total particle density $n$ is kept constant by solving for the chemical pote
 $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)$$
 
 ---
+### 3. Structure of the repository
 ```text
 ├── src/
 │   ├── config.py       # Global physical constants and grid parameters
@@ -42,6 +43,7 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 ├── main.py             # Entry point: the simulation workflow
 ├── requirements.txt    # List of required Python libraries (numpy, scipy, matplotlib)
 └── .gitignore          # Rules for Git to ignore temporary and environment files
+```
 ---
 ## Code Workflow
 
