@@ -1,42 +1,70 @@
-# BEC–BCS Crossover Simulation
+# BCS-BEC Crossover Simulation in 3D Fermi Gases
+
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
 
 ## Overview
+This project simulates the **BCS-BEC Crossover** in a 3D ultracold Fermi gas at zero temperature ($T=0$). Using a mean-field approach, the software solves the coupled self-consistent equations to track the evolution of the system from weakly bound Cooper pairs (BCS limit) to a Bose-Einstein Condensate (BEC) of tightly bound dimers.
 
-This project simulates the BEC–BCS crossover in ultracold Fermi gases using a mean-field approach.
+The transition is controlled by tuning the interaction strength via the dimensionless parameter $1/(k_F a)$, where $a$ is the s-wave scattering length.
 
-The goal is to study how the system evolves from a Bose–Einstein condensate (BEC) of tightly bound molecules 
-to a BCS superfluid of weakly bound Cooper pairs by tuning the interaction strength.
+> **Note on Project Scope:** This repository is not intended to provide a "perfect" or high-precision numerical solution for the unitary point. In the unitary regime ($1/k_Fa \approx 0$), advanced many-body methods such as Quantum Monte Carlo (QMC) or Extended BCS theories provide more accurate results than the standard mean-field approach used here. 
+>
+> The primary goal of this project is to study the **qualitative behavior** of the crossover through a **well-structured, reproducible, and professionally organized repository**, focusing on clean software practices applied to a complex physical problem.
 
 ---
 
 ## Physical Model
-The problem is described by a Fermi Hubbard many-body hamiltonian:
-add picture
 
-In the mean field approach we define a parameter pairing gap Δ, which is a measure of the strength of pairing:
-add picture
+The simulation solves the mean-field equations for a continuum Fermi gas.
 
-Using the mean field approach we find the energy of the excitations of the system:
-add picture
+### 1. Excitation Spectrum
+The energy of the quasiparticle excitations is given by:
+$$E_k = \sqrt{(\epsilon_k - \mu)^2 + \Delta^2}$$
+where $\epsilon_k = \frac{\hbar^2 k^2}{2m}$ is the single-particle kinetic energy.
 
-And the two fundamental equations:
-* gap equation (coherence in pairing):
-add picture
+### 2. The Regularized Gap Equation
+In 3D, the contact interaction leads to a UV divergence. We implement a regularized version of the gap equation to ensure convergence:
+$$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left( \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right)$$
 
-* number equation(mantains number of particles):
-add picture 
-
-We solve these mean-field equations at zero temperature, looking for the pairing gap and chemical potential so that both equations are 
-satisfied, solving the non linear coupled problem we compute:
-
-* the pairing gap Δ
-* the chemical potential μ
-
-as a function of the interaction parameter:
-
-1/(k_F a)
+### 3. The Number Equation
+The total particle density $n$ is kept constant by solving for the chemical potential $\mu$:
+$$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)$$
 
 ---
+### 3. Structure of the repository
+```text
+├── src/
+│   ├── config.py       # Global physical constants and grid parameters
+│   ├── physics.py      # Physics engine: energy spectrum and regularized integrals
+│   ├── solver.py       # Numerical engine: system of equations and root-finding
+│   └── plotting.py     # Visualization: plot formatting and export
+├── results/            # Output directory: saves plots (.png) and numerical data (.txt)
+├── tests/              # Software verification: tests for the modules
+├── main.py             # Entry point: the simulation workflow
+├── requirements.txt    # List of required Python libraries (numpy, scipy, matplotlib)
+└── .gitignore          # Rules for Git to ignore temporary and environment files
+```
+---
+## Code Workflow
+
+### 1. Initialization and Grid Setup
+The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. It generates a high-density momentum grid ($k$-space) using a large UV cutoff ($k_{max} \approx 100 k_F$).
+
+### 2. Physical Engine (`src/physics.py`)
+At the core of the simulation are the **Gap** and **Number** integrals. 
+*   **Regularization:** The gap equation is regularized by subtracting the vacuum divergence ($1/k^2$), allowing for a finite result without needing an arbitrary cutoff.
+*   **Vectorization:** Integrals are computed using `numpy` vectorization over the $k$-grid for maximum performance.
+
+### 3. Iterative Solving Logic (`src/solver.py`)
+Since the equations are non-linearly coupled, the code uses `scipy.optimize.root`. 
+*   **Coupled System:** The solver varies $\mu$ and $\Delta$ simultaneously to find the root where both the Gap and Number residuals are zero.
+*   **Stability:** To prevent the solver from finding unphysical solutions, $\Delta$ is treated as an absolute value within the energy spectrum calculation.
+
+### 4. The Continuation Method (`main.py`)
+To solve the entire crossover (from $1/k_Fa = -2$ to $+2$), the code implements a **Continuation Method**:
+1.  It starts at the **BCS limit**, where the solution is well-known ($\mu \approx E_F$).
+2.  After solving for one point, it uses that result as the **initial guess** for the next interaction strength.
+3.  This "step-by-step" approach allows the solver to track the solution smoothly, even when $\mu$ crosses zero and becomes negative in the BEC regime.
 
 ## Goals
 
@@ -46,15 +74,47 @@ as a function of the interaction parameter:
 
 ---
 
-## How to run
+## 3. Installation and Setup
 
+Follow these steps to set up the project on your local machine:
+
+### 1. Clone the repository
 ```bash
-pip install -r requirements.txt
-python src/main.py
+git clone https://github.com/valepioli/Software-project-many-body.git
+cd Software-project-many-body
 ```
+### 2. Install dependencies
+```
+pip install -r requirements.txt
+```
+---
+## 3. Running the simulation
+To execute the solver and generate the crossover data:
+```
+python3 main.py
+```
+## Outputs
+
+Upon execution, the simulation automatically creates a `results/` directory containing the following files:
+
+*   **`crossover_plot.png`**: A plot showing the evolution of the normalized Chemical Potential ($\mu/E_F$) and the Pairing Gap ($\Delta/E_F$) across the interaction range.
+*   **`crossover_data.txt`**: A tab-separated text file containing the raw numerical results ($1/k_Fa$, $\mu/E_F$, $\Delta/E_F$).
+## Expected Results
+
+The simulation tracks the transition from the BCS limit to the BEC limit. The numerical results should match the standard mean-field benchmarks at zero temperature:
+| Regime | Interaction ($1/k_Fa$) | $\mu / E_F$ | $\Delta / E_F$ | Physical Description |
+| :--- | :---: | :---: | :---: | :--- |
+| **BCS Limit** | $-2.0$ | $\approx 1.0$ | $\ll 1$ | Weakly interacting Cooper pairs |
+| **Unitary Point** | $0.0$ | $\approx 0.37$ | $\approx 0.44$ | Scattering length $a \to \infty$ |
+| **BEC Limit** | $+2.0$ | $< 0$ | $> 1.0$ | Tightly bound molecular dimers |
+
+###  Physical Evolution
+*   **Chemical Potential ($\mu$):** Starts at the Fermi energy ($\mu = E_F$) in the BCS regime, decreases as attraction increases, and crosses zero near the unitary point ($1/k_Fa \approx 0.55$ in mean-field). In the BEC limit, $\mu$ becomes deeply negative, approaching half the dimer binding energy: $\mu \to -1/2a^2$.
+*   **Pairing Gap ($\Delta$):** Increases monotonically from the BCS to the BEC side, representing the transition from a soft pairing energy to a strong molecular binding energy.
+
+![Crossover Plot](results/crossover_plot.png)
 
 ---
-
 ## Status
 
 Project started – work in progress.
