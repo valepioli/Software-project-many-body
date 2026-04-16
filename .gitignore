@@ -15,4 +15,7 @@ venv/
 # Logs
 *.log
 
+#libraries
+.venv
+.coverage
 
