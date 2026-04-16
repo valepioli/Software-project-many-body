@@ -13,7 +13,7 @@ from src.config import k_max, N, n_target, EF
 from src.physics import create_k_grid
 from src.solver import solve_bcs_system
 from src.plotting import plot_bcs_bec_crossover
-
+from src.plotting import plot_physical_regimes
 
 #1. SETUP
 # k_max and N are now taken from config.py
@@ -28,7 +28,7 @@ results = []
 
 # Define the range for the dimensionless interaction parameter 1/(kF * a)
 # Usually from -2 (BCS) to +2 (BEC)
-interaction_range = np.linspace(-2.0, 2.0, 40) 
+interaction_range = np.linspace(-3.0, 3.0, 40) 
 # initial_guess: We start with a guess close to the BCS limit (mu ~ EF, Delta small).
 # This guess will be updated dynamically to improve convergence.
 current_guess = [EF, 0.1]
@@ -61,6 +61,9 @@ for x in interaction_range:
 results_array = np.array(results)
 # NORMALIZATION: Divide by EF to get dimensionless units (mu/EF and Delta/EF)
 # This ensures the BCS limit starts at 1.0, which is physically correct.
+mu_vals= results_array[:, 0] 
+delta_vals = results_array[:, 1] 
+
 mu_vals_normalized = results_array[:, 0] / EF
 delta_vals_normalized = results_array[:, 1] / EF
 
@@ -82,3 +85,4 @@ print(f"Numerical data saved in {output_folder}/crossover_data.txt")
 # =============================================================================
 # Pass the folder path to the plot function to save the image
 plot_bcs_bec_crossover(interaction_range, mu_vals_normalized, delta_vals_normalized, save_path=output_folder)
+plot_physical_regimes(interaction_range, mu_vals, delta_vals)
