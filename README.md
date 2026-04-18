@@ -4,8 +4,13 @@
 
 ## Overview
 This project simulates the **BCS-BEC Crossover** in a 3D ultracold Fermi gas at zero temperature ($T=0$). Using a mean-field approach, the software solves the coupled self-consistent equations to track the evolution of the system from weakly bound Cooper pairs (BCS limit) to a Bose-Einstein Condensate (BEC) of tightly bound dimers.
-
 The transition is controlled by tuning the interaction strength via the dimensionless parameter $1/(k_F a)$, where $a$ is the s-wave scattering length.
+It numerically reproducse the physical results and characteristic plots of the evolution of the chemical potential and pairing gap—found in the literature, such as those presented in [**"BCS and BCS-BEC Crossover" by L. Lanaro**](https://materia.dfa.unipd.it/salasnich/phd/BCSandBCSBEC-Lanaro.pdf).
+
+<p align="center">
+  <img src="examples/physical_regimes.png" width="48%" alt="Physical Regimes" />
+  <img src="examples/crossover.png" width="48%" alt="Crossover Plot" />
+</p>
 
 > **Note on Project Scope:** This repository is not intended to provide a "perfect" or high-precision numerical solution for the unitary point. In the unitary regime ($1/k_Fa \approx 0$), advanced many-body methods such as Quantum Monte Carlo (QMC) or Extended BCS theories provide more accurate results than the standard mean-field approach used here. 
 >
@@ -114,6 +119,22 @@ The simulation tracks the transition from the BCS limit to the BEC limit. The nu
 
 ![Crossover Plot](results/crossover_plot.png)
 
+The following evolution is the expected physical result:
+
+### 1. The Change in Pair Size
+The crossover is fundamentally a competition between the **pair size** (coherence length) and the **inter-particle spacing**.
+*   **On the BCS side ($1/k_Fa < 0$):** Pairs are large and overlapping. Pairing occurs in momentum space among fermions near the Fermi surface.
+*   **On the BEC side ($1/k_Fa > 0$):** Pairs "shrink" into tightly bound dimers. These dimers are small enough to be treated as individual bosons in real space.
+
+### 2. The Role of the Chemical Potential ($\mu$)
+The ratio **$\mu/\Delta$** shown on the x-axis of the schematic is a key indicator of the regime:
+*   **$\mu > 0$:** Indicates the existence of a Fermi surface (BCS-like).
+*   **$\mu < 0$:** Indicates the "vacuum" of the constituent fermions; the particles are now entirely bound into bosonic molecules (BEC-like).
+
+### 3. Smooth Transition
+The image shows no "break" between these regimes. This confirms the **Crossover Hypothesis**: there is no phase transition between a BCS superconductor and a BEC condensate at $T=0$; they are two limits of the same underlying many-body state.
+
+![Physical_regimes](results/physical_regimes.png)
 ---
 ## Status
 
