@@ -67,7 +67,7 @@ At the core of the project is the simultaneous solution of the **BCS Gap Equatio
 *   **Vectorization:** Integrals are computed using `numpy` vectorization over the $k$-grid for maximum performance.
 
 ### 3. Iterative Solving Logic (`src/solver.py`)
-The system is described by two coupled, non-linear equations: \( f(\mu, \Delta) = 0 \).
+The system is described by two coupled, non-linear equations: $$\( f(\mu, \Delta) = 0 \)$$.
 
 - **Numerical method:** We solve these equations using the [`hybr` method](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html) from `scipy.optimize.root`. This method iteratively adjusts μ and Δ to reduce the residuals of both equations at the same time.
 
