@@ -85,4 +85,4 @@ print(f"Numerical data saved in {output_folder}/crossover_data.txt")
 # =============================================================================
 # Pass the folder path to the plot function to save the image
 plot_bcs_bec_crossover(interaction_range, mu_vals_normalized, delta_vals_normalized, save_path=output_folder)
-plot_physical_regimes(interaction_range, mu_vals, delta_vals)
+plot_physical_regimes(interaction_range, mu_vals, delta_vals, save_path=output_folder)
