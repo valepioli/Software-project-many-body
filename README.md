@@ -53,23 +53,32 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 ## Code Workflow
 
 ### 1. Initialization and Grid Setup
-The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. It generates a high-density momentum grid ($k$-space) using a large UV cutoff ($k_{max} \approx 100 k_F$).
+The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. *   **Units:** All energetic quantities are scaled by the Fermi energy $E_F = \frac{\hbar^2 k_F^2}{2m}$, and momenta are scaled by the Fermi momentum $k_F = (3\pi^2 n)^{1/3}$.
+*   **Momentum Grid:** The script constructs a high-resolution grid in $k$-space. We implement a large UV cutoff ($k_{max} \approx 100 k_F$). The integration measure is discretized as $dk \cdot k^2$ to account for the spherical symmetry of the 3D system.
 
 ### 2. Physical Engine (`src/physics.py`)
-At the core of the simulation are the **Gap** and **Number** integrals. 
-*   **Regularization:** The gap equation is regularized by subtracting the vacuum divergence ($1/k^2$), allowing for a finite result without needing an arbitrary cutoff.
+At the core of the project is the simultaneous solution of the **BCS Gap Equation** and the **Number Equation**. 
+
+*   **UV Renormalization:** The bare contact interaction in 3D leads to a ultraviolet divergence in the gap equation. The code implements a **renormalization scheme** by subtracting the vacuum scattering contribution directly within the integral:
+    $$\frac{1}{k_F a} = \frac{\pi}{2} \int_0^{\infty} dk \cdot k^2 \left[ \frac{1}{\sqrt{(\epsilon_k - \mu)^2 + \Delta^2}} - \frac{1}{\epsilon_k} \right]$$
+    This regularization allows the solver to compute finite results without physical dependence on the arbitrary momentum cutoff.
+*   **Density Constraint:** The number equation ensures particle conservation by relating the chemical potential $\mu$ and the gap $\Delta$ to the total density $n$:
+    $$1 = \frac{3}{2} \int_0^{\infty} dk \cdot k^2 \left[ 1 - \frac{\epsilon_k - \mu}{\sqrt{(\epsilon_k - \mu)^2 + \Delta^2}} \right]$$
 *   **Vectorization:** Integrals are computed using `numpy` vectorization over the $k$-grid for maximum performance.
 
 ### 3. Iterative Solving Logic (`src/solver.py`)
-Since the equations are non-linearly coupled, the code uses `scipy.optimize.root`. 
-*   **Coupled System:** The solver varies $\mu$ and $\Delta$ simultaneously to find the root where both the Gap and Number residuals are zero.
-*   **Stability:** To prevent the solver from finding unphysical solutions, $\Delta$ is treated as an absolute value within the energy spectrum calculation.
+The system is described by two coupled, non-linear equations: \( f(\mu, \Delta) = 0 \).
+
+- **Numerical method:** We solve these equations using the [`hybr` method](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html) from `scipy.optimize.root`. This method iteratively adjusts μ and Δ to reduce the residuals of both equations at the same time.
+
+- **Constraints:** As the system approaches the BEC regime, its behavior changes significantly when μ crosses zero. To ensure physically meaningful solutions, Δ is kept strictly positive. This avoids the trivial solution (Δ = 0) and keeps the energy expression well-defined.
+```
 
 ### 4. The Continuation Method (`main.py`)
-To solve the entire crossover (from $1/k_Fa = -2$ to $+2$), the code implements a **Continuation Method**:
-1.  It starts at the **BCS limit**, where the solution is well-known ($\mu \approx E_F$).
-2.  After solving for one point, it uses that result as the **initial guess** for the next interaction strength.
-3.  This "step-by-step" approach allows the solver to track the solution smoothly, even when $\mu$ crosses zero and becomes negative in the BEC regime.
+Solving the equations for a specific interaction strength $1/k_F a$ often fails because the solver's radius of convergence is narrow. To map the entire crossover, we implement a **Numerical Continuation Method**:
+1.  **Seed Solution:** The process begins in the **BCS Limit** ($1/k_Fa = -2.0$), where the analytical approximations $\mu \approx E_F$ and $\Delta \to 0$ provide a robust initial guess.
+2.  **Iterative Tracking:** The solver sweeps through interaction strengths in small increments $\delta(1/k_Fa)$. For each step $i$, the converged solution $\{\mu_{i-1}, \Delta_{i-1}\}$ is passed as the **initial guess** for step $i$.
+3.  **Phase Transition Handling:** This "step-by-step" approach allows the code to smoothly track the solution into the **Unitary Limit** ($1/k_Fa = 0$) and deep into the **BEC regime**, where $\mu$ becomes large and negative, representing the binding energy of molecules.
 
 ## Goals
 
