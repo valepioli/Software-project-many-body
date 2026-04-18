@@ -134,7 +134,7 @@ The ratio **$\mu/\Delta$** shown on the x-axis of the schematic is a key indicat
 ### 3. Smooth Transition
 The image shows no "break" between these regimes. This confirms the **Crossover Hypothesis**: there is no phase transition between a BCS superconductor and a BEC condensate at $T=0$; they are two limits of the same underlying many-body state.
 
-![Physical_regimes](results/regims_infographics.png)
+![regimes_infographic](results/regimes_infographics.png)
 ---
 ## Status
 
