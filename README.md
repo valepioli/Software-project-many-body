@@ -72,7 +72,6 @@ The system is described by two coupled, non-linear equations: \( f(\mu, \Delta) 
 - **Numerical method:** We solve these equations using the [`hybr` method](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html) from `scipy.optimize.root`. This method iteratively adjusts μ and Δ to reduce the residuals of both equations at the same time.
 
 - **Constraints:** As the system approaches the BEC regime, its behavior changes significantly when μ crosses zero. To ensure physically meaningful solutions, Δ is kept strictly positive. This avoids the trivial solution (Δ = 0) and keeps the energy expression well-defined.
-```
 
 ### 4. The Continuation Method (`main.py`)
 Solving the equations for a specific interaction strength $1/k_F a$ often fails because the solver's radius of convergence is narrow. To map the entire crossover, we implement a **Numerical Continuation Method**:
