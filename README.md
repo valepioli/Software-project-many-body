@@ -5,7 +5,7 @@
 ## Overview
 This project simulates the **BCS-BEC Crossover** in a 3D ultracold Fermi gas at zero temperature ($T=0$). Using a mean-field approach, the software solves the coupled self-consistent equations to track the evolution of the system from weakly bound Cooper pairs (BCS limit) to a Bose-Einstein Condensate (BEC) of tightly bound dimers.
 The transition is controlled by tuning the interaction strength via the dimensionless parameter $1/(k_F a)$, where $a$ is the s-wave scattering length.
-It numerically reproducse the physical results and characteristic plots of the evolution of the chemical potential and pairing gap—found in the literature, such as those presented in [**"BCS and BCS-BEC Crossover" by L. Lanaro**](https://materia.dfa.unipd.it/salasnich/phd/BCSandBCSBEC-Lanaro.pdf).
+It numerically reproduces the physical results and characteristic plots of the evolution of the chemical potential and pairing gap found in the literature, such as those presented in [**"BCS and BCS-BEC Crossover" by L. Lanaro**](https://materia.dfa.unipd.it/salasnich/phd/BCSandBCSBEC-Lanaro.pdf).
 
 <p align="center">
   <img src="examples/physical_regimes.png" width="48%" alt="Physical Regimes" />
