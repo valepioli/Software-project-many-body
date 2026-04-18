@@ -53,7 +53,8 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 ## Code Workflow
 
 ### 1. Initialization and Grid Setup
-The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. *   **Units:** All energetic quantities are scaled by the Fermi energy $E_F = \frac{\hbar^2 k_F^2}{2m}$, and momenta are scaled by the Fermi momentum $k_F = (3\pi^2 n)^{1/3}$.
+The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. 
+*   **Units:** All energetic quantities are scaled by the Fermi energy $E_F = \frac{\hbar^2 k_F^2}{2m}$, and momenta are scaled by the Fermi momentum $k_F = (3\pi^2 n)^{1/3}$.
 *   **Momentum Grid:** The script constructs a high-resolution grid in $k$-space. We implement a large UV cutoff ($k_{max} \approx 100 k_F$). The integration measure is discretized as $dk \cdot k^2$ to account for the spherical symmetry of the 3D system.
 
 ### 2. Physical Engine (`src/physics.py`)
