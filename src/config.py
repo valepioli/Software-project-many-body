@@ -30,10 +30,10 @@ EF = 0.5 * kF**2
 n_target = kF**3 / (6.0 * np.pi**2)
 
 #Minimum of interaction range 1/kFa
-int_min=-3
+start_x=-3
 
 #Maximum of interaction range 1/kFa
-int_max=3
+end_x=3
 
 #Number of points for the simulation(1/kFa steps)
 steps=40
