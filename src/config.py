@@ -28,3 +28,12 @@ EF = 0.5 * kF**2
 # Target density for a single spin species (n_tot / 2)
 # Formula: n = kF^3 / (6 * pi^2)
 n_target = kF**3 / (6.0 * np.pi**2)
+
+#Minimum of interaction range 1/kFa
+int_min=-3
+
+#Maximum of interaction range 1/kFa
+int_max=3
+
+#Number of points for the simulation(1/kFa steps)
+steps=40

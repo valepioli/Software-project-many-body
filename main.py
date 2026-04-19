@@ -9,7 +9,7 @@ print("BEC–BCS project started")
 
 import numpy as np
 import os
-from src.config import k_max, N, n_target, EF
+from src.config import k_max, N, n_target, EF, int_min, int_max, steps
 from src.physics import create_k_grid
 from src.solver import solve_bcs_system
 from src.plotting import plot_bcs_bec_crossover
@@ -18,7 +18,7 @@ from src.plotting import plot_physical_regimes
 #1. SETUP
 # k_max and N are now taken from config.py
 k, dk = create_k_grid(k_max=k_max, N=N)
-interaction_range = np.linspace(-2.0, 2.0, 40)
+interaction_range = np.linspace(int_min, int_max, steps)
 
 # =============================================================================
 # 2. CROSSOVER SWEEP (ROOT-FINDING LOOP)
