@@ -17,23 +17,101 @@ It numerically reproduces the physical results and characteristic plots of the e
 > The primary goal of this project is to study the **qualitative behavior** of the crossover through a **well-structured, reproducible, and professionally organized repository**, focusing on clean software practices applied to a complex physical problem.
 
 ---
+# Theoretical Background: The BCS–BEC Crossover
 
-## Physical Model
+## Ultracold Gas Context 
 
-The simulation solves the mean-field equations for a continuum Fermi gas.
+We study this model because it is directly relevant to ultracold Fermi gases, where the physics implemented in this code can be realized experimentally. In these systems, interactions are  controlled via Feshbach resonances, allowing one to tune the dimensionless parameter:
 
-### 1. Excitation Spectrum
-The energy of the quasiparticle excitations is given by:
-$$E_k = \sqrt{(\epsilon_k - \mu)^2 + \Delta^2}$$
-where $\epsilon_k = \frac{\hbar^2 k^2}{2m}$ is the single-particle kinetic energy.
+1 / (k_F a)
 
-### 2. The Regularized Gap Equation
-In 3D, the contact interaction leads to a UV divergence. We implement a regularized version of the gap equation to ensure convergence:
-$$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left( \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right)$$
+This enables direct exploration of the continuous crossover between BCS superfluidity and Bose–Einstein condensation, providing a realization of strongly correlated quantum matter.
 
-### 3. The Number Equation
-The total particle density $n$ is kept constant by solving for the chemical potential $\mu$:
-$$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)$$
+---
+
+## 1. Physical Regimes of the Crossover
+
+The interaction strength is characterized by:
+
+- `a`: s-wave scattering length  
+- `k_F`: Fermi momentum  
+
+The system evolves smoothly across three regimes:
+
+### BCS Regime (`1 / (k_F a) << -1`)
+- Weak attractive interaction  
+- Formation of large, overlapping Cooper pairs  
+- Chemical potential: `μ ≈ E_F > 0`  
+
+### Unitary Regime (`1 / (k_F a) = 0`)
+- Scattering length diverges (`a → ∞`)  
+- Strongly interacting system  
+- No intrinsic interaction length scale  
+
+### BEC Regime (`1 / (k_F a) >> 1`)
+- Strong attraction  
+- Formation of tightly bound bosonic dimers  
+- Chemical potential becomes negative  
+- Deep limit: `2μ → -E_b`  
+
+---
+
+## 2. Quasiparticle Excitation Spectrum
+
+The paired state is described by Bogoliubov quasiparticles with dispersion:
+
+E_k = sqrt((ε_k - μ)^2 + Δ^2)
+
+where:
+
+- `ε_k = ℏ² k² / (2m)` is the kinetic energy  
+- `μ` is the chemical potential  
+- `Δ` is the pairing gap  
+
+This spectrum defines the energy cost of breaking a pair and creating excitations.
+
+---
+
+## 3. Renormalized Gap Equation
+
+A contact interaction in 3D leads to ultraviolet divergence. This is removed by expressing the interaction in terms of the physical scattering length `a`.
+
+The renormalized gap equation is:
+
+- m / (4π ℏ² a) = ∫ (d³k / (2π)³) [ 1/(2ε_k) - 1/(2E_k) ]
+
+### Interpretation
+
+- `1 / (2ε_k)` → vacuum two-body scattering  
+- `1 / (2E_k)` → many-body contribution  
+
+Each term diverges individually, but their difference is finite.  
+This regularization ensures physically meaningful results when using a finite momentum cutoff.
+
+---
+
+## 4. Number Equation
+
+The density constraint is enforced through:
+
+n = ∫ (d³k / (2π)³) [ 1 - (ε_k - μ)/E_k ]
+
+This determines how particles occupy momentum states.
+
+---
+
+## 5. Solution
+
+The system is fully determined by solving simultaneously:
+
+- Gap equation → determines `Δ`  
+- Number equation → fixes `μ`  
+
+for a given interaction strength `1 / (k_F a)`.
+
+- `μ` and `Δ` are nonlinearly coupled  
+- Both appear in the quasiparticle spectrum  
+- No closed-form solution exists  
 
 ---
 ### 3. Structure of the repository
@@ -55,7 +133,7 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 ### 1. Initialization and Grid Setup
 The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. 
 *   **Units:** All energetic quantities are scaled by the Fermi energy $E_F = \frac{\hbar^2 k_F^2}{2m}$, and momenta are scaled by the Fermi momentum $k_F = (3\pi^2 n)^{1/3}$.
-*   **Momentum Grid:** The script constructs a high-resolution grid in $k$-space. We implement a large UV cutoff ($k_{max} \approx 100 k_F$). The integration measure is discretized as $dk \cdot k^2$ to account for the spherical symmetry of the 3D system.
+*   **Momentum Grid:** The script constructs a high-resolution grid in $k$-space and implement a large UV cutoff ($k_{max} \approx 100 k_F$). The integration measure is discretized as $dk \cdot k^2$ to account for the spherical symmetry of the 3D system.
 
 ### 2. Physical Engine (`src/physics.py`)
 At the core of the project is the simultaneous solution of the **BCS Gap Equation** and the **Number Equation**. 
