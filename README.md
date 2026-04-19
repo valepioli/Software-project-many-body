@@ -154,7 +154,7 @@ The system is described by two coupled, non-linear equations: $$\( f(\mu, \Delta
 
 ### 4. The Continuation Method (`main.py`)
 Solving the equations for a specific interaction strength $1/k_F a$ often fails because the solver's radius of convergence is narrow. To map the entire crossover, we implement a **Numerical Continuation Method**:
-1.  **Seed Solution:** The process begins in the **BCS Limit** ($1/k_Fa = -2.0$), where the analytical approximations $\mu \approx E_F$ and $\Delta \to 0$ provide a robust initial guess.
+1.  **Seed Solution:** The process begins in the **BCS Limit**, where the analytical approximations $\mu \approx E_F$ and $\Delta \to 0$ provide a robust initial guess.
 2.  **Iterative Tracking:** The solver sweeps through interaction strengths in small increments $\delta(1/k_Fa)$. For each step $i$, the converged solution $\{\mu_{i-1}, \Delta_{i-1}\}$ is passed as the **initial guess** for step $i$.
 3.  **Phase Transition Handling:** This "step-by-step" approach allows the code to smoothly track the solution into the **Unitary Limit** ($1/k_Fa = 0$) and deep into the **BEC regime**, where $\mu$ becomes large and negative.
 
