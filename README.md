@@ -23,7 +23,7 @@ It numerically reproduces the physical results and characteristic plots of the e
 
 We study this model because it is directly relevant to ultracold Fermi gases, where the physics implemented in this code can be realized experimentally. In these systems, interactions are  controlled via Feshbach resonances, allowing one to tune the dimensionless parameter:
 
-1 / (k_F a)
+$1 / (k_F a)$
 
 This enables direct exploration of the continuous crossover between BCS superfluidity and Bose–Einstein condensation, providing a realization of strongly correlated quantum matter.
 
@@ -34,25 +34,25 @@ This enables direct exploration of the continuous crossover between BCS superflu
 The interaction strength is characterized by:
 
 - `a`: s-wave scattering length  
-- `k_F`: Fermi momentum  
+- `$k_F$`: Fermi momentum  
 
 The system evolves smoothly across three regimes:
 
-### BCS Regime (`1 / (k_F a) << -1`)
+### BCS Regime (`$1 / (k_F a)$ << -1`)
 - Weak attractive interaction  
 - Formation of large, overlapping Cooper pairs  
 - Chemical potential: `μ ≈ E_F > 0`  
 
-### Unitary Regime (`1 / (k_F a) = 0`)
+### Unitary Regime (`$1 / (k_F a)$ = 0`)
 - Scattering length diverges (`a → ∞`)  
 - Strongly interacting system  
 - No intrinsic interaction length scale  
 
-### BEC Regime (`1 / (k_F a) >> 1`)
+### BEC Regime (`$1 / (k_F a)$ >> 1`)
 - Strong attraction  
 - Formation of tightly bound bosonic dimers  
 - Chemical potential becomes negative  
-- Deep limit: `2μ → -E_b`  
+- Deep limit: `2μ → -$E_b$`  
 
 ---
 
@@ -60,11 +60,11 @@ The system evolves smoothly across three regimes:
 
 The paired state is described by Bogoliubov quasiparticles with dispersion:
 
-E_k = sqrt((ε_k - μ)^2 + Δ^2)
+$$E_k = sqrt((ε_k - μ)^2 + Δ^2)$$
 
 where:
 
-- `ε_k = ℏ² k² / (2m)` is the kinetic energy  
+- `$ε_k = ℏ² k² / (2m)$` is the kinetic energy  
 - `μ` is the chemical potential  
 - `Δ` is the pairing gap  
 
@@ -78,12 +78,12 @@ A contact interaction in 3D leads to ultraviolet divergence. This is removed by 
 
 The renormalized gap equation is:
 
-- m / (4π ℏ² a) = ∫ (d³k / (2π)³) [ 1/(2ε_k) - 1/(2E_k) ]
+$$- m / (4π ℏ² a) = ∫ (d³k / (2π)³) [ 1/(2ε_k) - 1/(2E_k) ]$$
 
 ### Interpretation
 
-- `1 / (2ε_k)` → vacuum two-body scattering  
-- `1 / (2E_k)` → many-body contribution  
+- `$1 / (2ε_k)$` → vacuum two-body scattering  
+- `$1 / (2E_k)$` → many-body contribution  
 
 Each term diverges individually, but their difference is finite.  
 This regularization ensures physically meaningful results when using a finite momentum cutoff.
@@ -94,7 +94,7 @@ This regularization ensures physically meaningful results when using a finite mo
 
 The density constraint is enforced through:
 
-n = ∫ (d³k / (2π)³) [ 1 - (ε_k - μ)/E_k ]
+$$n = ∫ (d³k / (2π)³) [ 1 - (ε_k - μ)/E_k ]$$
 
 This determines how particles occupy momentum states.
 
@@ -107,7 +107,7 @@ The system is fully determined by solving simultaneously:
 - Gap equation → determines `Δ`  
 - Number equation → fixes `μ`  
 
-for a given interaction strength `1 / (k_F a)`.
+for a given interaction strength `$1 / (k_F a)$`.
 
 - `μ` and `Δ` are nonlinearly coupled  
 - Both appear in the quasiparticle spectrum  
