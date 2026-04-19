@@ -102,11 +102,37 @@ cd Software-project-many-body
 pip install -r requirements.txt
 ```
 ---
-## 3. Running the simulation
-To execute the solver and generate the crossover data:
-```
+## Usage and Command Line Interface (CLI)
+
+This project uses `argparse` to allow users to interact with the simulation without modifying the source code. You can customize the numerical resolution and physical range directly from the terminal.
+
+### Running the Simulation
+To run the simulation with the default configuration:
+```bash
 python3 main.py
 ```
+## Customizing Parameters
+You can override the defaults using flags. This is useful for running quick tests with lower resolution or focusing on specific interaction ranges:
+```
+python main.py --n_points 500 --steps 10 --start_x -1.5 --end_x 1.5 --output custom_results
+```
+#### Available CLI Arguments:
+
+| Argument | Description | Default Value |
+| :--- | :--- | :--- |
+| `--n_points` | Number of points in the momentum grid ($N$) | `10000` |
+| `--k_max` | Momentum cutoff in units of $k_F$ | `100.0` |
+| `--steps` | Number of steps in the interaction sweep | `40` |
+| `--start_x` | Starting interaction strength $1/(k_F a)$ (BCS side) | `-3.0` |
+| `--end_x` | Ending interaction strength $1/(k_F a)$ (BEC side) | `3.0` |
+| `--output` | Directory name where results and plots are saved | `results` |
+
+### Help Command
+ To see the full list of parameters and their descriptions directly in your terminal, run:
+```bash
+python3 main.py --help
+```
+
 ## Outputs
 
 Upon execution, the simulation automatically creates a `results/` directory containing the following files:
