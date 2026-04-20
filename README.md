@@ -96,14 +96,18 @@ For a given interaction strength $1/(k_F a)$, the following conditions apply:
 │   ├── config.py         # Global physical constants and grid parameters
 │   ├── physics.py        # Physics engine: energy spectrum and regularized integrals
 │   ├── solver.py         # Numerical engine: system of equations and root-finding
-│   └── plotting.py       # Visualization: plot formatting and export
-├── results/              # Output directory: saves plots (.png) and numerical data (.txt)
-├── tests/                # Software verification: tests for the modules
-│   ├── test_integrals.py # Tests for the integral functions in physics.py    
-│   ├── test_solver.py    # Tests for the solver function in solver.py    
-├── main.py               # Entry point: the simulation workflow
-├── requirements.txt      # List of required Python libraries (numpy, scipy, matplotlib)
-└── .gitignore            # Rules for Git to ignore temporary and environment files
+│   └── plotting.py       # Visualization functions (non-blocking)
+├── results/              # Numerical data directory: stores crossover_data.txt
+├── images/               # Visualization directory: stores .png plots
+├── examples/             # Example images from the bibliography
+├── tests/                # Software verification
+│   ├── test_integrals.py # Tests for physical consistency of integrals
+│   └── test_solver.py    # Tests for the gap solver
+├── main.py               # Simulation entry point: runs the solver and saves data
+├── plot_results.py       # Analysis entry point: loads data and generates/updates plots
+├── requirements.txt      # Python dependencies (numpy, scipy, matplotlib)
+├── .gitignore            # Rules for Git (ignores __pycache__, results/, etc.)
+└── README.md             # Project documentation (Theoretical Background)
 ```
 ---
 ## Code Workflow
@@ -182,6 +186,8 @@ python main.py --n_points 500 --steps 10 --start_x -1.5 --end_x 1.5 --output cus
 | `--start_x` | Starting interaction strength $1/(k_F a)$ (BCS side) | `-3.0` |
 | `--end_x` | Ending interaction strength $1/(k_F a)$ (BEC side) | `3.0` |
 | `--output` | Directory name where results and plots are saved | `results` |
+
+
 
 ### Help Command
  To see the full list of parameters and their descriptions directly in your terminal, run:
