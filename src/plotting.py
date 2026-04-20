@@ -3,6 +3,7 @@
 Created on Sun Apr 12 19:25 2026
 
 @author: Pioli Valeria
+
 """
 
 import matplotlib.pyplot as plt
@@ -78,7 +79,7 @@ def plot_bcs_bec_crossover(interaction_range, mu_vals, delta_vals, save_path=Non
         plt.savefig(file_name, dpi=300)
         print(f"Plot saved in {file_name}")
 
-    plt.show()
+    plt.close(fig)
 
 
 def plot_physical_regimes(interaction_range, mu_vals, delta_vals, save_path=None):
@@ -149,6 +150,4 @@ def plot_physical_regimes(interaction_range, mu_vals, delta_vals, save_path=None
         out_file = os.path.join(save_path, "regimes_infographic.png")
         plt.savefig(out_file, dpi=300)
         print(f"Infographic saved to {out_file}")
-
-    plt.show()
 

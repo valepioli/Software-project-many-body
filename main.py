@@ -3,6 +3,9 @@
 Created on Sat Apr 4 18:15 2026
 
 @author: Pioli Valeria
+
+Main simulation script: Solves the BCS-BEC crossover equations and 
+saves the numerical results to a text file.
 """
 
 print("BEC–BCS project started")
@@ -29,9 +32,10 @@ def main():
 
     args = parser.parse_args()
 
-    print(f"BEC–BCS project started: k_max={args.k_max}, N={args.n_points}, Steps={args.steps}")
+    print(f"BEC–BCS project started: k_max={args.k_max}, N={args.n_points}, start_x={args.start_x}, end_x={args.end_x}, Steps={args.steps}")
 
     #1. SETUP
+    os.makedirs(args.output, exist_ok=True)
     #create momentum space k grid
     k, dk = create_k_grid(k_max=args.k_max, N=args.n_points)
     # Define the range for the dimensionless interaction parameter 1/(kF * a)
@@ -78,31 +82,19 @@ def main():
     mu_vals= results_array[:, 0] 
     delta_vals = results_array[:, 1] 
 
-    mu_vals_normalized = results_array[:, 0] / EF
-    delta_vals_normalized = results_array[:, 1] / EF
-
-    if not os.path.exists(args.output):
-         os.makedirs(args.output)
-
     # --- Save results to folder ---
     output_folder = "results"
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     # Combine interaction range, mu and delta into one matrix for saving
-    data_to_save = np.column_stack((interaction_range, mu_vals_normalized, delta_vals_normalized))
-
+    data_to_save = np.column_stack((interaction_range, mu_vals, delta_vals))
+   
     # Save as a text file
     header = "1/kFa, mu/EF, Delta/EF"
     np.savetxt(f"{output_folder}/crossover_data.txt", data_to_save, header=header, fmt="%.6f", delimiter="\t")
     print(f"Numerical data saved in {output_folder}/crossover_data.txt")
 
-    # =============================================================================
-    # 4. VISUALIZATION
-    # =============================================================================
-    # Pass the folder path to the plot function to save the image
-    plot_bcs_bec_crossover(interaction_range, mu_vals_normalized, delta_vals_normalized, save_path=output_folder)
-    plot_physical_regimes(interaction_range, mu_vals, delta_vals, save_path=output_folder)
 
 if __name__ == "__main__":
     main()
