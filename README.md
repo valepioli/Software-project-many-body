@@ -21,52 +21,36 @@ It numerically reproduces the physical results and characteristic plots of the e
 
 ## Ultracold Gas Context 
 
-We study this model because it is directly relevant to ultracold Fermi gases, where the physics implemented in this code can be realized experimentally. In these systems, interactions are  controlled via Feshbach resonances, allowing one to tune the dimensionless parameter:
+We study this model because it is directly relevant to **ultracold Fermi gases**, where the physics implemented in this code can be realized experimentally. In these systems, interactions are controlled via **Feshbach resonances**, allowing one to tune the dimensionless parameter:
 
-$1 / (k_F a)$
+$$\eta = \frac{1}{k_F a}$$
 
-This enables direct exploration of the continuous crossover between BCS superfluidity and Bose–Einstein condensation, providing a realization of strongly correlated quantum matter.
+This enables direct exploration of the continuous crossover between BCS superfluidity and Bose–Einstein condensation (BEC), providing a realization of strongly correlated quantum matter.
 
 ---
 
 ## 1. Physical Regimes of the Crossover
 
-The interaction strength is characterized by:
+The interaction strength is characterized by the s-wave scattering length ($a$) and the Fermi momentum ($k_F$). The system evolves smoothly across three main regimes:
 
-- `a`: s-wave scattering length  
-- `$k_F$`: Fermi momentum  
-
-The system evolves smoothly across three regimes:
-
-### BCS Regime (`$1 / (k_F a)$ << -1`)
-- Weak attractive interaction  
-- Formation of large, overlapping Cooper pairs  
-- Chemical potential: `μ ≈ E_F > 0`  
-
-### Unitary Regime (`$1 / (k_F a)$ = 0`)
-- Scattering length diverges (`a → ∞`)  
-- Strongly interacting system  
-- No intrinsic interaction length scale  
-
-### BEC Regime (`$1 / (k_F a)$ >> 1`)
-- Strong attraction  
-- Formation of tightly bound bosonic dimers  
-- Chemical potential becomes negative  
-- Deep limit: `2μ → -$E_b$`  
+| Regime | Parameter Range | Description |
+| :--- | :--- | :--- |
+| **BCS Regime** | $1/(k_F a) \ll -1$ | Weak attractive interaction; formation of large, overlapping Cooper pairs. $\mu \approx E_F > 0$. |
+| **Unitary Regime** | $1/(k_F a) = 0$ | Scattering length diverges ($a \to \infty$); strongly interacting system with no intrinsic length scale. |
+| **BEC Regime** | $1/(k_F a) \gg 1$ | Strong attraction; formation of tightly bound bosonic dimers. $\mu$ becomes negative ($2\mu \to -E_b$). |
 
 ---
 
 ## 2. Quasiparticle Excitation Spectrum
 
-The paired state is described by Bogoliubov quasiparticles with dispersion:
+The paired state is described by **Bogoliubov quasiparticles** with the following dispersion relation:
 
-$$E_k = sqrt((ε_k - μ)^2 + Δ^2)$$
+$$E_k = \sqrt{(\epsilon_k - \mu)^2 + \Delta^2}$$
 
-where:
-
-- `$ε_k = ℏ² k² / (2m)$` is the kinetic energy  
-- `μ` is the chemical potential  
-- `Δ` is the pairing gap  
+Where:
+- $\epsilon_k = \frac{\hbar^2 k^2}{2m}$ is the kinetic energy.
+- $\mu$ is the chemical potential.
+- $\Delta$ is the pairing gap.
 
 This spectrum defines the energy cost of breaking a pair and creating excitations.
 
@@ -74,46 +58,38 @@ This spectrum defines the energy cost of breaking a pair and creating excitation
 
 ## 3. Renormalized Gap Equation
 
-A contact interaction in 3D leads to ultraviolet divergence. This is removed by expressing the interaction in terms of the physical scattering length `a`.
+A contact interaction in 3D leads to ultraviolet divergence. This is removed by expressing the interaction in terms of the physical scattering length $a$. The renormalized gap equation is:
 
-The renormalized gap equation is:
-
-$$- m / (4π ℏ² a) = ∫ (d³k / (2π)³) [ 1/(2ε_k) - 1/(2E_k) ]$$
+$$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left[ \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right]$$
 
 ### Interpretation
+- $\frac{1}{2\epsilon_k} \rightarrow$ Vacuum two-body scattering.
+- $\frac{1}{2E_k} \rightarrow$ Many-body contribution.
 
-- `$1 / (2ε_k)$` → vacuum two-body scattering  
-- `$1 / (2E_k)$` → many-body contribution  
-
-Each term diverges individually, but their difference is finite.  
-This regularization ensures physically meaningful results when using a finite momentum cutoff.
+Each term diverges individually, but their difference is finite. This regularization ensures physically meaningful results when using a finite momentum cutoff in numerical simulations.
 
 ---
 
 ## 4. Number Equation
 
-The density constraint is enforced through:
+The density constraint is enforced through the number equation, which determines how particles occupy momentum states:
 
-$$n = ∫ (d³k / (2π)³) [ 1 - (ε_k - μ)/E_k ]$$
-
-This determines how particles occupy momentum states.
+$$n = \int \frac{d^3k}{(2\pi)^3} \left[ 1 - \frac{\epsilon_k - \mu}{E_k} \right]$$
 
 ---
 
-## 5. Solution
+## 5. Numerical Solution
 
-The system is fully determined by solving simultaneously:
+The system state is fully determined by solving the following two equations simultaneously:
 
-- Gap equation → determines `Δ`  
-- Number equation → fixes `μ`  
+1.  **Gap Equation**: Determines the pairing gap $\Delta$.
+2.  **Number Equation**: Fixes the chemical potential $\mu$.
 
-for a given interaction strength `$1 / (k_F a)$`.
-
-- `μ` and `Δ` are nonlinearly coupled  
-- Both appear in the quasiparticle spectrum  
-- No closed-form solution exists  
-
----
+For a given interaction strength $1/(k_F a)$, the following conditions apply:
+- $\mu$ and $\Delta$ are **nonlinearly coupled**.
+- Both parameters appear inside the integrals within the quasiparticle spectrum $E_k$.
+- No closed-form solution exists; the system must be solved numerically.
+  
 ### 3. Structure of the repository
 ```text
 ├── src/
@@ -123,6 +99,8 @@ for a given interaction strength `$1 / (k_F a)$`.
 │   └── plotting.py     # Visualization: plot formatting and export
 ├── results/            # Output directory: saves plots (.png) and numerical data (.txt)
 ├── tests/              # Software verification: tests for the modules
+│   ├── test_integrals.py      
+│   ├── test_folder.py        
 ├── main.py             # Entry point: the simulation workflow
 ├── requirements.txt    # List of required Python libraries (numpy, scipy, matplotlib)
 └── .gitignore          # Rules for Git to ignore temporary and environment files
