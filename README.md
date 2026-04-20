@@ -17,37 +17,93 @@ It numerically reproduces the physical results and characteristic plots of the e
 > The primary goal of this project is to study the **qualitative behavior** of the crossover through a **well-structured, reproducible, and professionally organized repository**, focusing on clean software practices applied to a complex physical problem.
 
 ---
+# Theoretical Background: The BCS–BEC Crossover
 
-## Physical Model
+## Ultracold Gas Context 
 
-The simulation solves the mean-field equations for a continuum Fermi gas.
+We study this model because it is directly relevant to **ultracold Fermi gases**, where the physics implemented in this code can be realized experimentally. In these systems, interactions are controlled via **Feshbach resonances**, allowing one to tune the dimensionless parameter:
 
-### 1. Excitation Spectrum
-The energy of the quasiparticle excitations is given by:
-$$E_k = \sqrt{(\epsilon_k - \mu)^2 + \Delta^2}$$
-where $\epsilon_k = \frac{\hbar^2 k^2}{2m}$ is the single-particle kinetic energy.
+$$\eta = \frac{1}{k_F a}$$
 
-### 2. The Regularized Gap Equation
-In 3D, the contact interaction leads to a UV divergence. We implement a regularized version of the gap equation to ensure convergence:
-$$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left( \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right)$$
-
-### 3. The Number Equation
-The total particle density $n$ is kept constant by solving for the chemical potential $\mu$:
-$$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)$$
+This enables direct exploration of the continuous crossover between BCS superfluidity and Bose–Einstein condensation (BEC), providing a realization of strongly correlated quantum matter.
 
 ---
+
+## 1. Physical Regimes of the Crossover
+
+The interaction strength is characterized by the s-wave scattering length ($a$) and the Fermi momentum ($k_F$). The system evolves smoothly across three main regimes:
+
+| Regime | Parameter Range | Description |
+| :--- | :--- | :--- |
+| **BCS Regime** | $1/(k_F a) \ll -1$ | Weak attractive interaction; formation of large, overlapping Cooper pairs. $\mu \approx E_F > 0$. |
+| **Unitary Regime** | $1/(k_F a) = 0$ | Scattering length diverges ($a \to \infty$); strongly interacting system with no intrinsic length scale. |
+| **BEC Regime** | $1/(k_F a) \gg 1$ | Strong attraction; formation of tightly bound bosonic dimers. $\mu$ becomes negative ($2\mu \to -E_b$). |
+
+---
+
+## 2. Quasiparticle Excitation Spectrum
+
+The paired state is described by **Bogoliubov quasiparticles** with the following dispersion relation:
+
+$$E_k = \sqrt{(\epsilon_k - \mu)^2 + \Delta^2}$$
+
+Where:
+- $\epsilon_k = \frac{\hbar^2 k^2}{2m}$ is the kinetic energy.
+- $\mu$ is the chemical potential.
+- $\Delta$ is the pairing gap.
+
+This spectrum defines the energy cost of breaking a pair and creating excitations.
+
+---
+
+## 3. Renormalized Gap Equation
+
+A contact interaction in 3D leads to ultraviolet divergence. This is removed by expressing the interaction in terms of the physical scattering length $a$. The renormalized gap equation is:
+
+$$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left[ \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right]$$
+
+### Interpretation
+- $\frac{1}{2\epsilon_k} \rightarrow$ Vacuum two-body scattering.
+- $\frac{1}{2E_k} \rightarrow$ Many-body contribution.
+
+Each term diverges individually, but their difference is finite. This regularization ensures physically meaningful results when using a finite momentum cutoff in numerical simulations.
+
+---
+
+## 4. Number Equation
+
+The density constraint is enforced through the number equation, which determines how particles occupy momentum states:
+
+$$n = \int \frac{d^3k}{(2\pi)^3} \left[ 1 - \frac{\epsilon_k - \mu}{E_k} \right]$$
+
+---
+
+## 5. Numerical Solution
+
+The system state is fully determined by solving the following two equations simultaneously:
+
+1.  **Gap Equation**: Determines the pairing gap $\Delta$.
+2.  **Number Equation**: Fixes the chemical potential $\mu$.
+
+For a given interaction strength $1/(k_F a)$, the following conditions apply:
+- $\mu$ and $\Delta$ are **nonlinearly coupled**.
+- Both parameters appear inside the integrals within the quasiparticle spectrum $E_k$.
+- No closed-form solution exists; the system must be solved numerically.
+  
 ### 3. Structure of the repository
 ```text
 ├── src/
-│   ├── config.py       # Global physical constants and grid parameters
-│   ├── physics.py      # Physics engine: energy spectrum and regularized integrals
-│   ├── solver.py       # Numerical engine: system of equations and root-finding
-│   └── plotting.py     # Visualization: plot formatting and export
-├── results/            # Output directory: saves plots (.png) and numerical data (.txt)
-├── tests/              # Software verification: tests for the modules
-├── main.py             # Entry point: the simulation workflow
-├── requirements.txt    # List of required Python libraries (numpy, scipy, matplotlib)
-└── .gitignore          # Rules for Git to ignore temporary and environment files
+│   ├── config.py         # Global physical constants and grid parameters
+│   ├── physics.py        # Physics engine: energy spectrum and regularized integrals
+│   ├── solver.py         # Numerical engine: system of equations and root-finding
+│   └── plotting.py       # Visualization: plot formatting and export
+├── results/              # Output directory: saves plots (.png) and numerical data (.txt)
+├── tests/                # Software verification: tests for the modules
+│   ├── test_integrals.py # Tests for the integral functions in physics.py    
+│   ├── test_solver.py    # Tests for the solver function in solver.py    
+├── main.py               # Entry point: the simulation workflow
+├── requirements.txt      # List of required Python libraries (numpy, scipy, matplotlib)
+└── .gitignore            # Rules for Git to ignore temporary and environment files
 ```
 ---
 ## Code Workflow
@@ -55,7 +111,7 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left( 1 - \frac{\epsilon_k - \mu}{E_k} \right)
 ### 1. Initialization and Grid Setup
 The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. 
 *   **Units:** All energetic quantities are scaled by the Fermi energy $E_F = \frac{\hbar^2 k_F^2}{2m}$, and momenta are scaled by the Fermi momentum $k_F = (3\pi^2 n)^{1/3}$.
-*   **Momentum Grid:** The script constructs a high-resolution grid in $k$-space. We implement a large UV cutoff ($k_{max} \approx 100 k_F$). The integration measure is discretized as $dk \cdot k^2$ to account for the spherical symmetry of the 3D system.
+*   **Momentum Grid:** The script constructs a high-resolution grid in $k$-space and implement a large UV cutoff ($k_{max} \approx 100 k_F$). The integration measure is discretized as $dk \cdot k^2$ to account for the spherical symmetry of the 3D system.
 
 ### 2. Physical Engine (`src/physics.py`)
 At the core of the project is the simultaneous solution of the **BCS Gap Equation** and the **Number Equation**. 
@@ -76,9 +132,9 @@ The system is described by two coupled, non-linear equations: $$\( f(\mu, \Delta
 
 ### 4. The Continuation Method (`main.py`)
 Solving the equations for a specific interaction strength $1/k_F a$ often fails because the solver's radius of convergence is narrow. To map the entire crossover, we implement a **Numerical Continuation Method**:
-1.  **Seed Solution:** The process begins in the **BCS Limit** ($1/k_Fa = -2.0$), where the analytical approximations $\mu \approx E_F$ and $\Delta \to 0$ provide a robust initial guess.
+1.  **Seed Solution:** The process begins in the **BCS Limit**, where the analytical approximations $\mu \approx E_F$ and $\Delta \to 0$ provide a robust initial guess.
 2.  **Iterative Tracking:** The solver sweeps through interaction strengths in small increments $\delta(1/k_Fa)$. For each step $i$, the converged solution $\{\mu_{i-1}, \Delta_{i-1}\}$ is passed as the **initial guess** for step $i$.
-3.  **Phase Transition Handling:** This "step-by-step" approach allows the code to smoothly track the solution into the **Unitary Limit** ($1/k_Fa = 0$) and deep into the **BEC regime**, where $\mu$ becomes large and negative, representing the binding energy of molecules.
+3.  **Phase Transition Handling:** This "step-by-step" approach allows the code to smoothly track the solution into the **Unitary Limit** ($1/k_Fa = 0$) and deep into the **BEC regime**, where $\mu$ becomes large and negative.
 
 ## Goals
 
