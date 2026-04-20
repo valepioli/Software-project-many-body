@@ -93,17 +93,17 @@ For a given interaction strength $1/(k_F a)$, the following conditions apply:
 ### 3. Structure of the repository
 ```text
 ├── src/
-│   ├── config.py       # Global physical constants and grid parameters
-│   ├── physics.py      # Physics engine: energy spectrum and regularized integrals
-│   ├── solver.py       # Numerical engine: system of equations and root-finding
-│   └── plotting.py     # Visualization: plot formatting and export
-├── results/            # Output directory: saves plots (.png) and numerical data (.txt)
-├── tests/              # Software verification: tests for the modules
-│   ├── test_integrals.py      
-│   ├── test_folder.py        
-├── main.py             # Entry point: the simulation workflow
-├── requirements.txt    # List of required Python libraries (numpy, scipy, matplotlib)
-└── .gitignore          # Rules for Git to ignore temporary and environment files
+│   ├── config.py         # Global physical constants and grid parameters
+│   ├── physics.py        # Physics engine: energy spectrum and regularized integrals
+│   ├── solver.py         # Numerical engine: system of equations and root-finding
+│   └── plotting.py       # Visualization: plot formatting and export
+├── results/              # Output directory: saves plots (.png) and numerical data (.txt)
+├── tests/                # Software verification: tests for the modules
+│   ├── test_integrals.py # Tests for the integral functions in physics.py    
+│   ├── test_solver.py    # Tests for the solver function in solver.py    
+├── main.py               # Entry point: the simulation workflow
+├── requirements.txt      # List of required Python libraries (numpy, scipy, matplotlib)
+└── .gitignore            # Rules for Git to ignore temporary and environment files
 ```
 ---
 ## Code Workflow
