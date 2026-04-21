@@ -28,14 +28,20 @@ def main():
     parser.add_argument("--start_x", type=float, default=start_x, help="Starting 1/(kF*a) (BCS)")
     parser.add_argument("--end_x", type=float, default=end_x, help="Ending 1/(kF*a) (BEC)")
     parser.add_argument("--steps", type=int, default=steps, help="Number of interaction steps")
-    parser.add_argument("--output", type=str, default="results", help="Folder to save results")
+    
+    # Output Arguments
+    parser.add_argument("--output_dir", type=str, default="results", 
+                        help="Folder to save results (default: results)")
+    parser.add_argument("--filename", type=str, default="crossover_data.txt", 
+                        help="Name of the output file (default: crossover_data.txt)")
+
 
     args = parser.parse_args()
 
     print(f"BEC–BCS project started: k_max={args.k_max}, N={args.n_points}, start_x={args.start_x}, end_x={args.end_x}, Steps={args.steps}")
 
     #1. SETUP
-    os.makedirs(args.output, exist_ok=True)
+    os.makedirs(args.output_dir, exist_ok=True)
     #create momentum space k grid
     k, dk = create_k_grid(k_max=args.k_max, N=args.n_points)
     # Define the range for the dimensionless interaction parameter 1/(kF * a)
@@ -82,19 +88,19 @@ def main():
     mu_vals= results_array[:, 0] 
     delta_vals = results_array[:, 1] 
 
-    # --- Save results to folder ---
-    output_folder = "results"
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
-    # Combine interaction range, mu and delta into one matrix for saving
+    # Combine interaction range, mu, and delta into one matrix
     data_to_save = np.column_stack((interaction_range, mu_vals, delta_vals))
    
+    # Construct final path
+    output_path = os.path.join(args.output_dir, args.filename)
+    
     # Save as a text file
-    header = "1/kFa, mu/EF, Delta/EF"
-    np.savetxt(f"{output_folder}/crossover_data.txt", data_to_save, header=header, fmt="%.6f", delimiter="\t")
-    print(f"Numerical data saved in {output_folder}/crossover_data.txt")
-
+    # Note: We save raw physical values; normalization is handled by the plotting script.
+    header = "1/kFa\tmu\tDelta"
+    np.savetxt(output_path, data_to_save, header=header, fmt="%.6f", delimiter="\t")
+    
+    print(f"Simulation finished successfully.")
+    print(f"Numerical data saved in: {output_path}")
 
 if __name__ == "__main__":
     main()
