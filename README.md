@@ -163,15 +163,15 @@ pip install -r requirements.txt
 ```
 ---
 ## Usage and Command Line Interface (CLI)
-
-This project uses `argparse` to allow users to interact with the simulation without modifying the source code. You can customize the numerical resolution and physical range directly from the terminal.
-
+The project is split into two independent phases. This allows you to update plot styles instantly without re-running the numerical calculations.
 ### Running the Simulation
+This script solves the equations and saves the raw numerical results.
 To run the simulation with the default configuration:
 ```bash
 python3 main.py
 ```
 ## Customizing Parameters
+This project uses `argparse` to allow users to interact with the simulation without modifying the source code. You can customize the numerical resolution and physical range directly from the terminal.
 You can override the defaults using flags. This is useful for running quick tests with lower resolution or focusing on specific interaction ranges:
 ```
 python main.py --n_points 500 --steps 10 --start_x -1.5 --end_x 1.5 --output custom_results
@@ -185,7 +185,8 @@ python main.py --n_points 500 --steps 10 --start_x -1.5 --end_x 1.5 --output cus
 | `--steps` | Number of steps in the interaction sweep | `40` |
 | `--start_x` | Starting interaction strength $1/(k_F a)$ (BCS side) | `-3.0` |
 | `--end_x` | Ending interaction strength $1/(k_F a)$ (BEC side) | `3.0` |
-| `--output` | Directory name where results and plots are saved | `results` |
+| `--output` | Directory name where results are saved | `results` |
+| `--filename` | Name of file .txt output of the simulation | `crossover.txt` |
 
 
 
@@ -195,26 +196,55 @@ python main.py --n_points 500 --steps 10 --start_x -1.5 --end_x 1.5 --output cus
 python3 main.py --help
 ```
 
-## Outputs
+### Generating Plots (plot_results.py)
+This script reads the data, normalizes it, and exports images.
+To run the simulation with the default configuration:
+```bash
+python plot_results.py
+```
+## Custom execution
+You can override the defaults using flags to plot different executions already created from the simulation.
+```
+python plot_results.py --data_dir "my_run" --data_file "high_res.txt" --output_dir "final_plots"
+```
 
-Upon execution, the simulation automatically creates a `results/` directory containing the following files:
+#### Available CLI Arguments:
 
-*   **`crossover_plot.png`**: A plot showing the evolution of the normalized Chemical Potential ($\mu/E_F$) and the Pairing Gap ($\Delta/E_F$) across the interaction range.
-*   **`crossover_data.txt`**: A tab-separated text file containing the raw numerical results ($1/k_Fa$, $\mu/E_F$, $\Delta/E_F$).
+| Argument | Description | Default Value |
+| :--- | :--- | :--- |
+| `--data_dir` | Folder where the .txt file is located | `results` |
+| `--data_file` | Name of the file to analyze | `crossover_data.txt` |
+| `--output_dir` | Folder where plots will be saved | `images` |
+
+
+##  Outputs
+Scripts automatically create output directories if they do not exist.
+
+### 1. Numerical Results (`results/`)
+*   **`crossover_data.txt`**: A tab-separated file containing the raw numerical results:
+    *   Interaction strength ($1/k_F a$)
+    *   Chemical potential ($\mu$)
+    *   Pairing gap ($\Delta$)
+
+### 2. Visualizations (`images/`)
+*   **`crossover_plot.png`**: Normalized values of $\mu/E_F$ and $\Delta/E_F$ compared with literature benchmarks (Mean Field and Monte Carlo).
+*   **`regimes_infographic.png`**: A trajectory plot showing the system transition through the crossover regimes as a function of the binding energy and the $\mu/\Delta$ ratio.
+
+
 ## Expected Results
 
 The simulation tracks the transition from the BCS limit to the BEC limit. The numerical results should match the standard mean-field benchmarks at zero temperature:
 | Regime | Interaction ($1/k_Fa$) | $\mu / E_F$ | $\Delta / E_F$ | Physical Description |
 | :--- | :---: | :---: | :---: | :--- |
 | **BCS Limit** | $-2.0$ | $\approx 1.0$ | $\ll 1$ | Weakly interacting Cooper pairs |
-| **Unitary Point** | $0.0$ | $\approx 0.37$ | $\approx 0.44$ | Scattering length $a \to \infty$ |
+| **Unitary Point** | $0.0$ | $\approx 0.55$ | $\approx 0.69$ | Scattering length $a \to \infty$ |
 | **BEC Limit** | $+2.0$ | $< 0$ | $> 1.0$ | Tightly bound molecular dimers |
 
 ###  Physical Evolution
 *   **Chemical Potential ($\mu$):** Starts at the Fermi energy ($\mu = E_F$) in the BCS regime, decreases as attraction increases, and crosses zero near the unitary point ($1/k_Fa \approx 0.55$ in mean-field). In the BEC limit, $\mu$ becomes deeply negative, approaching half the dimer binding energy: $\mu \to -1/2a^2$.
 *   **Pairing Gap ($\Delta$):** Increases monotonically from the BCS to the BEC side, representing the transition from a soft pairing energy to a strong molecular binding energy.
 
-![Crossover Plot](results/crossover_plot.png)
+![Crossover Plot](images/crossover_plot.png)
 
 The following evolution is the expected physical result:
 
@@ -231,7 +261,7 @@ The ratio **$\mu/\Delta$** shown on the x-axis of the schematic is a key indicat
 ### 3. Smooth Transition
 The image shows no "break" between these regimes. This confirms the **Crossover Hypothesis**: there is no phase transition between a BCS superconductor and a BEC condensate at $T=0$; they are two limits of the same underlying many-body state.
 
-![regimes_infographic](results/regimes_infographic.png)
+![regimes_infographic](images/regimes_infographic.png)
 
 ---
 ## Status
