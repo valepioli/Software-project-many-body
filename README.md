@@ -19,7 +19,7 @@ It numerically reproduces the physical results and characteristic plots of the e
 ---
 # Theoretical Background: The BCS–BEC Crossover
 
-## Ultracold Gas Context 
+### Ultracold Gas Context 
 
 We study this model because it is directly relevant to **ultracold Fermi gases**, where the physics implemented in this code can be realized experimentally. In these systems, interactions are controlled via **Feshbach resonances**, allowing one to tune the dimensionless parameter:
 
@@ -29,7 +29,7 @@ This enables direct exploration of the continuous crossover between BCS superflu
 
 ---
 
-## 1. Physical Regimes of the Crossover
+### 1. Physical Regimes of the Crossover
 
 The interaction strength is characterized by the s-wave scattering length ($a$) and the Fermi momentum ($k_F$). The system evolves smoothly across three main regimes:
 
@@ -41,7 +41,7 @@ The interaction strength is characterized by the s-wave scattering length ($a$) 
 
 ---
 
-## 2. Quasiparticle Excitation Spectrum
+### 2. Quasiparticle Excitation Spectrum
 
 The paired state is described by **Bogoliubov quasiparticles** with the following dispersion relation:
 
@@ -56,13 +56,13 @@ This spectrum defines the energy cost of breaking a pair and creating excitation
 
 ---
 
-## 3. Renormalized Gap Equation
+### 3. Renormalized Gap Equation
 
 A contact interaction in 3D leads to ultraviolet divergence. This is removed by expressing the interaction in terms of the physical scattering length $a$. The renormalized gap equation is:
 
 $$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left[ \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \right]$$
 
-### Interpretation
+#### Interpretation
 - $\frac{1}{2\epsilon_k} \rightarrow$ Vacuum two-body scattering.
 - $\frac{1}{2E_k} \rightarrow$ Many-body contribution.
 
@@ -70,7 +70,7 @@ Each term diverges individually, but their difference is finite. This regulariza
 
 ---
 
-## 4. Number Equation
+### 4. Number Equation
 
 The density constraint is enforced through the number equation, which determines how particles occupy momentum states:
 
@@ -78,19 +78,16 @@ $$n = \int \frac{d^3k}{(2\pi)^3} \left[ 1 - \frac{\epsilon_k - \mu}{E_k} \right]
 
 ---
 
-## 5. Numerical Solution
+### 5. Numerical Solution
 
-The system state is fully determined by solving the following two equations simultaneously:
-
-1.  **Gap Equation**: Determines the pairing gap $\Delta$.
-2.  **Number Equation**: Fixes the chemical potential $\mu$.
+The system state is fully determined by solving the following two equations simultaneously.
 
 For a given interaction strength $1/(k_F a)$, the following conditions apply:
 - $\mu$ and $\Delta$ are **nonlinearly coupled**.
 - Both parameters appear inside the integrals within the quasiparticle spectrum $E_k$.
 - No closed-form solution exists; the system must be solved numerically.
   
-### 3. Structure of the repository
+## Structure of the repository
 ```text
 ├── src/
 │   ├── config.py         # Global physical constants and grid parameters
@@ -140,15 +137,9 @@ Solving the equations for a specific interaction strength $1/k_F a$ often fails 
 2.  **Iterative Tracking:** The solver sweeps through interaction strengths in small increments $\delta(1/k_Fa)$. For each step $i$, the converged solution $\{\mu_{i-1}, \Delta_{i-1}\}$ is passed as the **initial guess** for step $i$.
 3.  **Phase Transition Handling:** This "step-by-step" approach allows the code to smoothly track the solution into the **Unitary Limit** ($1/k_Fa = 0$) and deep into the **BEC regime**, where $\mu$ becomes large and negative.
 
-## Goals
-
-* Implement a numerical solver for the coupled equations
-* Explore the crossover physics
-* Produce plots of μ and Δ
-
 ---
 
-## 3. Installation and Setup
+##  Installation and Setup
 
 Follow these steps to set up the project on your local machine:
 
@@ -162,15 +153,14 @@ cd Software-project-many-body
 pip install -r requirements.txt
 ```
 ---
-## Usage and Command Line Interface (CLI)
-The project is split into two independent phases. This allows you to update plot styles instantly without re-running the numerical calculations.
-### Running the Simulation
-This script solves the equations and saves the raw numerical results.
+## Running the Simulation
+The project is split into two independent phases. This allows to update plot styles instantly without re-running the numerical calculations.
+### Usage and Command Line Interface (CLI)
 To run the simulation with the default configuration:
 ```bash
 python3 main.py
 ```
-## Customizing Parameters
+#### Customizing Parameters
 This project uses `argparse` to allow users to interact with the simulation without modifying the source code. You can customize the numerical resolution and physical range directly from the terminal.
 You can override the defaults using flags. This is useful for running quick tests with lower resolution or focusing on specific interaction ranges:
 ```
@@ -190,7 +180,7 @@ python main.py --n_points 500 --steps 10 --start_x -1.5 --end_x 1.5 --output cus
 
 
 
-### Help Command
+#### Help Command
  To see the full list of parameters and their descriptions directly in your terminal, run:
 ```bash
 python3 main.py --help
@@ -202,7 +192,7 @@ To run the simulation with the default configuration:
 ```bash
 python plot_results.py
 ```
-## Custom execution
+#### Custom execution
 You can override the defaults using flags to plot different executions already created from the simulation.
 ```
 python plot_results.py --data_dir "my_run" --data_file "high_res.txt" --output_dir "final_plots"
@@ -245,8 +235,6 @@ The simulation tracks the transition from the BCS limit to the BEC limit. The nu
 *   **Pairing Gap ($\Delta$):** Increases monotonically from the BCS to the BEC side, representing the transition from a soft pairing energy to a strong molecular binding energy.
 
 ![Crossover Plot](images/crossover_plot.png)
-
-The following evolution is the expected physical result:
 
 ### 1. The Change in Pair Size
 The crossover is fundamentally a competition between the **pair size** (coherence length) and the **inter-particle spacing**.
