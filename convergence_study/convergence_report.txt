@@ -1,0 +1,6 @@
+CONVERGENCE STUDY REPORT
+========================
+
+Test at Unitarity (1/kFa = 0)
+Final Solution: mu/EF = 0.5971, Delta/EF = 0.6836
+Solver Residuals: Gap=1.36e-13, Number=-1.29e-14
