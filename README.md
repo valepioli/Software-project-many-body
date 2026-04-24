@@ -97,7 +97,7 @@ For a given interaction strength $1/(k_F a)$, the following conditions apply:
 ├── results/              # Numerical data directory (crossover_data.txt)
 ├── images/               # Visualization directory (.png plots)
 ├── examples/             # Reference images from bibliography
-├── convergence_study/    # Created automatically: convergence plots and reports
+├── convergence_study/    # Convergence plots and reports
 ├── tests/                # Unit tests for software verification
 │   ├── test_integrals.py # Tests for physical consistency of integrals
 │   └── test_solver.py    # Tests for the gap solver
