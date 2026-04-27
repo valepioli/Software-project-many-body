@@ -99,7 +99,7 @@ For a given interaction strength $1/(k_F a)$, the following conditions apply:
 ├── examples/             # Reference images from bibliography
 ├── convergence_study/    # Convergence plots and reports
 ├── tests/                # Unit tests for software verification
-│   ├── test_integrals.py # Tests for physical consistency of integrals
+│   ├── test_physics.py # Tests for physical consistency of integrals
 │   └── test_solver.py    # Tests for the gap solver
 ├── main.py               # Phase 1: Simulation entry point (saves data)
 ├── plot_results.py       # Phase 2: Analysis entry point (generates plots)
