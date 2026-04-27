@@ -94,17 +94,19 @@ For a given interaction strength $1/(k_F a)$, the following conditions apply:
 │   ├── physics.py        # Physics engine: energy spectrum and regularized integrals
 │   ├── solver.py         # Numerical engine: system of equations and root-finding
 │   └── plotting.py       # Visualization functions (non-blocking)
-├── results/              # Numerical data directory: stores crossover_data.txt
-├── images/               # Visualization directory: stores .png plots
-├── examples/             # Example images from the bibliography
-├── tests/                # Software verification
+├── results/              # Numerical data directory (crossover_data.txt)
+├── images/               # Visualization directory (.png plots)
+├── examples/             # Reference images from bibliography
+├── convergence_study/    # Convergence plots and reports
+├── tests/                # Unit tests for software verification
 │   ├── test_integrals.py # Tests for physical consistency of integrals
 │   └── test_solver.py    # Tests for the gap solver
-├── main.py               # Simulation entry point: runs the solver and saves data
-├── plot_results.py       # Analysis entry point: loads data and generates/updates plots
+├── main.py               # Phase 1: Simulation entry point (saves data)
+├── plot_results.py       # Phase 2: Analysis entry point (generates plots)
+├── test_convergence.py   # Numerical validation: Study of N and k_max stability
 ├── requirements.txt      # Python dependencies (numpy, scipy, matplotlib)
-├── .gitignore            # Rules for Git (ignores __pycache__, results/, etc.)
-└── README.md             # Project documentation (Theoretical Background)
+├── .gitignore            # Git exclusion rules (__pycache__, results/, etc.)
+└── README.md             # Project documentation
 ```
 ---
 ## Code Workflow
@@ -134,8 +136,7 @@ The system is described by two coupled, non-linear equations: $$\( f(\mu, \Delta
 ### 4. The Continuation Method (`main.py`)
 Solving the equations for a specific interaction strength $1/k_F a$ often fails because the solver's radius of convergence is narrow. To map the entire crossover, we implement a **Numerical Continuation Method**:
 1.  **Seed Solution:** The process begins in the **BCS Limit**, where the analytical approximations $\mu \approx E_F$ and $\Delta \to 0$ provide a robust initial guess.
-2.  **Iterative Tracking:** The solver sweeps through interaction strengths in small increments $\delta(1/k_Fa)$. For each step $i$, the converged solution $\{\mu_{i-1}, \Delta_{i-1}\}$ is passed as the **initial guess** for step $i$.
-3.  **Phase Transition Handling:** This "step-by-step" approach allows the code to smoothly track the solution into the **Unitary Limit** ($1/k_Fa = 0$) and deep into the **BEC regime**, where $\mu$ becomes large and negative.
+2.  **Iterative Tracking:** The solver sweeps through interaction strengths in small increments $\delta(1/k_Fa)$. For each step $i$, the converged solution $\{\mu_{i-1}, \Delta_{i-1}\}$ is passed as the **initial guess** for step $i$. This "step-by-step" approach allows the code to smoothly track the solution into the **Unitary Limit** ($1/k_Fa = 0$) and deep into the **BEC regime**, where $\mu$ becomes large and negative.
 
 ---
 
@@ -219,6 +220,54 @@ Scripts automatically create output directories if they do not exist.
 ### 2. Visualizations (`images/`)
 *   **`crossover_plot.png`**: Normalized values of $\mu/E_F$ and $\Delta/E_F$ compared with literature benchmarks (Mean Field and Monte Carlo).
 *   **`regimes_infographic.png`**: A trajectory plot showing the system transition through the crossover regimes as a function of the binding energy and the $\mu/\Delta$ ratio.
+
+## Convergence and Numerical Validation
+
+Since this model is solved numerically, it is essential to verify that the results are independent of the choice of discretization parameters. The `check_convergence.py` script validates the stability of the solver.
+
+### 1. Grid Density Analysis ($N$)
+This test evaluates how many momentum points are required for the integration to converge to a stable value. 
+*   **Physical meaning:** Ensures that the discrete sum over the $k$-grid accurately approximates the continuous integral.
+*   **Expected behavior:** As $N$ increases, the chemical potential ($\mu$) and pairing gap ($\Delta$) should reach a plateau. A choice of $N = 10,000$ typically ensures a precision of $< 0.1\%$.
+
+### 2. Momentum Cutoff Analysis ($k_{max}$)
+In 3D, contact interactions lead to ultraviolet (UV) divergences. We use **Renormalization Theory** to remove this dependence by expressing the interaction in terms of the scattering length $a$.
+*   **Physical meaning:** Validates that the physics is captured at low momenta and that the high-momentum tail is correctly regularized.
+*   **Interpretation of the "Drift":** If $k_{max}$ is increased while keeping $N$ fixed, the grid spacing $dk = k_{max}/N$ becomes too large. This leads to a loss of resolution in the low-momentum region ($k \approx k_F$) where the physics is concentrated, causing a numerical drift. 
+*   **Optimal Range:** The results are most stable when $k_{max}$ is large enough to remove divergences ($k_{max} > 50$) but small enough to maintain a fine resolution $dk$.
+
+### 3. Solver Residuals
+This test checks the accuracy of the root-finding algorithm (`scipy.optimize.root`).
+*   **Logic:** Once the solver finds a solution $(\mu, \Delta)$, we plug these values back into the Gap and Number equations.
+*   **Target:** The "residuals" (the difference from zero) should be extremely small (typically $< 10^{-8}$), confirming that the numerical root is precise.
+
+---
+
+### Running the Convergence Study
+
+To verify the numerical stability on your machine and generate the convergence report:
+
+```bash
+python3 check_convergence.py
+```
+#### Outputs
+The script creates a `convergence_study/` directory containing the following files:
+
+*   **`convergence_N.png`**: A plot demonstrating the stabilization of results as a function of grid density.
+*   **`convergence_kmax.png`**: A plot demonstrating the effectiveness of renormalization and the impact of the momentum cutoff.
+*   **`convergence_report.txt`**: A text summary providing the final solver residuals and detailed numerical precision data.
+
+##### 1. Grid Density ($N$)
+![Grid Convergence](convergence_study/convergence_N.png)
+*   **Analysis**: We look for the **plateau** where the lines become horizontal. This confirms that the results are stable and that the chosen number of points ($N$) is sufficient to capture the physics.
+
+##### 2. Momentum Cutoff ($k_{max}$)
+![Cutoff Convergence](convergence_study/convergence_kmax.png)
+*   **Analysis**: Due to **renormalization**, the results remain stable over a wide range of cutoffs. 
+*   **Note**: The "drift" at very high $k_{max}$ is a **numerical artifact**. Because $N$ is fixed, a larger cutoff increases the grid spacing ($dk$), which lowers the resolution in the crucial low-momentum region.
+
+##### 3. Numerical Precision
+Check the **`convergence_report.txt`** for the solver residuals. Values near $10^{-9}$ confirm that the root-finder has successfully converged to a mathematically exact solution for both the Gap and Number equations.
 
 
 ## Expected Results
