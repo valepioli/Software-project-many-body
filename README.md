@@ -221,6 +221,8 @@ Scripts automatically create output directories if they do not exist.
 *   **`crossover_plot.png`**: Normalized values of $\mu/E_F$ and $\Delta/E_F$ compared with literature benchmarks (Mean Field and Monte Carlo).
 *   **`regimes_infographic.png`**: A trajectory plot showing the system transition through the crossover regimes as a function of the binding energy and the $\mu/\Delta$ ratio.
 
+---
+
 ## Testing and Coverage
 
 This project uses `pytest` for unit testing and `pytest-cov` to measure code coverage.
@@ -251,6 +253,8 @@ To generate a coverage report and ensure all physical logic (integrals, solvers,
 
 - **Boundary Conditions**  
   Correct handling of edge cases and limits.
+
+---
 
 ## Convergence and Numerical Validation
 
@@ -300,6 +304,7 @@ The script creates a `convergence_study/` directory containing the following fil
 ##### 3. Numerical Precision
 Check the **`convergence_report.txt`** for the solver residuals. Values near $10^{-9}$ confirm that the root-finder has successfully converged to a mathematically exact solution for both the Gap and Number equations.
 
+---
 
 ## Expected Results
 
@@ -331,6 +336,29 @@ The image shows no "break" between these regimes. This confirms the **Crossover 
 
 ![regimes_infographic](images/regimes_infographic.png)
 
+---
+
+## Future Extensions: Non-Zero Temperature and Beyond Mean-Field
+
+The current implementation focuses on the zero-temperature ($T=0$) mean-field limit. To further expand this project, one could implement the following extensions:
+
+### 1. Extension to Finite Temperature ($T > 0$)
+At non-zero temperatures, the presence of thermal quasiparticle excitations modifies the density and the pairing strength. The equations must be updated to include the **Fermi-Dirac distribution** $f(E_k) = \frac{1}{e^{\beta E_k} + 1}$, where $\beta = 1/k_B T$.
+
+#### Updated Gap Equation
+The gap equation acquires a factor that accounts for the thermal occupation of quasiparticle states, which effectively reduces the pairing gap until it vanishes at a critical temperature $T_c$:
+$$-\frac{m}{4\pi \hbar^2 a} = \int \frac{d^3k}{(2\pi)^3} \left[ \frac{1}{2\epsilon_k} - \frac{1}{2E_k} \tanh\left(\frac{\beta E_k}{2}\right) \right]$$
+
+#### Updated Number Equation
+The total density now includes both the "condensate" contribution and the thermally excited quasiparticles:
+$$n = \int \frac{d^3k}{(2\pi)^3} \left[ 1 - \frac{\epsilon_k - \mu}{E_k} \tanh\left(\frac{\beta E_k}{2}\right) \right]$$
+
+Implementing these would allow the simulation of the **Phase Diagram** of the crossover, identifying the superfluid transition temperature $T_c$.
+
+### 2. Beyond Mean-Field Models
+While the mean-field approach captures the qualitative physics, it overestimates the chemical potential and the gap near the unitary limit and on the BEC side.
+To improve accuracy, more refined models could be implemented.
+ 
 ---
 ## Status
 
