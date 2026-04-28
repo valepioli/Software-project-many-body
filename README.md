@@ -25,7 +25,8 @@ We study this model because it is directly relevant to **ultracold Fermi gases**
 
 $$\eta = \frac{1}{k_F a}$$
 
-This enables direct exploration of the continuous crossover between BCS superfluidity and Bose–Einstein condensation (BEC), providing a realization of strongly correlated quantum matter.
+This enables direct exploration of the continuous crossover between BCS superfluidity and Bose–Einstein condensation (BEC), providing a realization of strongly correlated quantum matter. For a full treatment of the theory refer to  [**"Many-Body Physics 
+with Cold Atoms**](https://www2.uibk.ac.at/downloads/c705291/mbultracold.pdf).
 
 ---
 
