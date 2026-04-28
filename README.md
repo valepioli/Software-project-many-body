@@ -221,6 +221,37 @@ Scripts automatically create output directories if they do not exist.
 *   **`crossover_plot.png`**: Normalized values of $\mu/E_F$ and $\Delta/E_F$ compared with literature benchmarks (Mean Field and Monte Carlo).
 *   **`regimes_infographic.png`**: A trajectory plot showing the system transition through the crossover regimes as a function of the binding energy and the $\mu/\Delta$ ratio.
 
+## Testing and Coverage
+
+This project uses `pytest` for unit testing and `pytest-cov` to measure code coverage.
+
+### 1. Install Testing Tools
+
+    pip install pytest pytest-cov
+
+### 2. Run Tests
+
+Execute the following command to run the suite of physical and numerical tests:
+
+    pytest -v
+
+### 3. Check Coverage
+
+To generate a coverage report and ensure all physical logic (integrals, solvers, and spectrum calculations) is tested:
+
+    pytest --cov=src --cov-report=term-missing
+
+### What the Tests Verify
+
+- **Physical Consistency**  
+  Bogoliubov quasiparticle spectrum and integral renormalization.
+
+- **Numerical Stability**  
+  Convergence of the non-linear root-finder across different regimes.
+
+- **Boundary Conditions**  
+  Correct handling of edge cases and limits.
+
 ## Convergence and Numerical Validation
 
 Since this model is solved numerically, it is essential to verify that the results are independent of the choice of discretization parameters. The `check_convergence.py` script validates the stability of the solver.
