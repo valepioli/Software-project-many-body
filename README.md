@@ -155,8 +155,8 @@ The functions in physics.py are:
 
 #### Energy definitions
 The following quantities are computed:
-- Kinetic energy: $$epsilon_k = \frac{k^2}{2}$$
-- Shifted energy: $$xi_k = \epsilon_k - \mu$$
+- Kinetic energy: $$\epsilon_k = \frac{k^2}{2}$$
+- Shifted energy: $$\xi_k = \epsilon_k - \mu$$
 - Quasiparticle energy
 - Gap Equation 
 - Number Equation
