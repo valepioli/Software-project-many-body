@@ -116,6 +116,27 @@ For a given interaction strength $1/(k_F a)$, the following conditions apply:
 The script starts by loading physical parameters (density $n$, Fermi energy $E_F$) from `src/config.py`. 
 *   **Units:** All energetic quantities are scaled by the Fermi energy $E_F = \frac{\hbar^2 k_F^2}{2m}$, and momenta are scaled by the Fermi momentum $k_F = (3\pi^2 n)^{1/3}$.
 *   **Momentum Grid:** The script constructs a high-resolution grid in $k$-space and implement a large UV cutoff ($k_{max} \approx 100 k_F$). The integration measure is discretized as $dk \cdot k^2$ to account for the spherical symmetry of the 3D system.
+#### Key parameters:
+- **Fermi momentum (`kF`)**  
+  Set as the natural unit of inverse length.
+
+- **Momentum cutoff (`k_max`)**  
+  Defines the ultraviolet (UV) limit of integration in momentum space.
+
+- **Grid resolution (`N`)**  
+  Number of points in the momentum grid. Must be large enough to ensure numerical accuracy.
+
+- **Fermi energy (`EF`)**  
+  $$E_F = \frac{k_F^2}{2}$$
+
+- **Target density (`n_target`)**  
+  Density per spin species:
+  $$n = \frac{k_F^3}{6\pi^2}$$
+
+- **Interaction range (`1/k_F a`)**
+  - `start_x`: BCS regime limit  
+  - `end_x`: BEC regime limit  
+  - `steps`: number of points in the sweep  
 
 ### 2. Physical Engine (`src/physics.py`)
 At the core of the project is the simultaneous solution of the **BCS Gap Equation** and the **Number Equation**. 
@@ -127,12 +148,42 @@ At the core of the project is the simultaneous solution of the **BCS Gap Equatio
     $$1 = \frac{3}{2} \int_0^{\infty} dk \cdot k^2 \left[ 1 - \frac{\epsilon_k - \mu}{\sqrt{(\epsilon_k - \mu)^2 + \Delta^2}} \right]$$
 *   **Vectorization:** Integrals over the $$\(k\)-grid$$ are computed by applying NumPy operations directly to the full array of momentum values, rather than looping over each \(k\) point. This allows the expressions to be evaluated in parallel over the entire grid, making the numerical integration much faster and more efficient, especially for large momentum cutoffs.
 
+The functions in physics.py are:
+#### Momentum grid
+- Generates a uniform grid in momentum space
+- Avoids $$k = 0$$ to prevent numerical divergences
+
+#### Energy definitions
+The following quantities are computed:
+- Kinetic energy: $$epsilon_k = \frac{k^2}{2}$$
+- Shifted energy: $$xi_k = \epsilon_k - \mu$$
+- Quasiparticle energy
+- Gap Equation 
+- Number Equation
+
+
 ### 3. Iterative Solving Logic (`src/solver.py`)
 The system is described by two coupled, non-linear equations: $$\( f(\mu, \Delta) = 0 \)$$.
 
 - **Numerical method:** We solve these equations using the [`hybr` method](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html) from `scipy.optimize.root`. This method iteratively adjusts μ and Δ to reduce the residuals of both equations at the same time.
 
 - **Constraints:** As the system approaches the BEC regime, its behavior changes significantly when μ crosses zero. To ensure physically meaningful solutions, Δ is kept strictly positive. This avoids the trivial solution (Δ = 0) and keeps the energy expression well-defined.
+
+#### Core functions:
+- `bcs_objective_functions`  
+  Computes residuals of:
+  - Gap equation  
+  - Number equation  
+
+- `solve_bcs_system`  
+  Returns:
+  - Chemical potential \(\mu\)
+  - Gap parameter \(\Delta\)
+
+#### Stability considerations:
+- Uses \(|\Delta|\) to avoid non-physical values
+- Returns `NaN` if the solver fails to converge
+
 
 ### 4. The Continuation Method (`main.py`)
 Solving the equations for a specific interaction strength $1/k_F a$ often fails because the solver's radius of convergence is narrow. To map the entire crossover, we implement a **Numerical Continuation Method**:
