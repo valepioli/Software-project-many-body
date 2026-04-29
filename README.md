@@ -125,7 +125,7 @@ At the core of the project is the simultaneous solution of the **BCS Gap Equatio
     This regularization allows the solver to compute finite results without physical dependence on the arbitrary momentum cutoff.
 *   **Density Constraint:** The number equation ensures particle conservation by relating the chemical potential $\mu$ and the gap $\Delta$ to the total density $n$:
     $$1 = \frac{3}{2} \int_0^{\infty} dk \cdot k^2 \left[ 1 - \frac{\epsilon_k - \mu}{\sqrt{(\epsilon_k - \mu)^2 + \Delta^2}} \right]$$
-*   **Vectorization:** Integrals over the \(k\)-grid are computed by applying NumPy operations directly to the full array of momentum values, rather than looping over each \(k\) point. This allows the expressions for \( \epsilon_k \) and \( E_k \) to be evaluated in parallel over the entire grid, making the numerical integration much faster and more efficient, especially for large momentum cutoffs.
+*   **Vectorization:** Integrals over the $$\(k\)-grid$$ are computed by applying NumPy operations directly to the full array of momentum values, rather than looping over each \(k\) point. This allows the expressions for $$\( \epsilon_k \)$$ and $$\( E_k \)$$ to be evaluated in parallel over the entire grid, making the numerical integration much faster and more efficient, especially for large momentum cutoffs.
 
 ### 3. Iterative Solving Logic (`src/solver.py`)
 The system is described by two coupled, non-linear equations: $$\( f(\mu, \Delta) = 0 \)$$.
